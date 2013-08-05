@@ -1,53 +1,3 @@
-rm(list= ls())
-
-# Daten generieren:
-
-# Installiere Paket
-# utils::install.packages(pkgs="../spatioTemporalData/spatioTemporalData_1.0.zip", 
-#                         repos = NULL)
-
-require(spatioTemporalData)
-require(SAE)
-set.seed(2)
-setup <- simSetupMarhuenda(nDomains=50, nTime=10, sarCorr=0.5, arCorr=0.5)
-output <- simRunMarhuenda(setup)
-dat <- slot(output[[1]], "data")[[1]]
-sigmaE <- slot(output[[1]], "sigma")
-
-# Prepare Data
-dat <- dat[order(dat$Domain, dat$Time), ]
-XY <- makeXY(y ~ x, dat)
-
-getNDomains <- function(dat) length(unique(dat$Domain))
-getNTime <- function(dat) length(unique(dat$Time))
-
-my.psi<-function(u,k = 1.345,deriv = 0){
-  var.weights = rep(1, length(u))
-  sm<-median(abs(u/sqrt(var.weights)))/0.6745
-  w <- MASS::psi.huber(u/(sm * sqrt(var.weights)),k, deriv)
-  if (!deriv) return(w*u) else return(w)
-}
-
-modelSpecs <- list(y = XY$y,
-                   x = XY$x,
-                   nDomains = getNDomains(dat),
-                   nTime = getNTime(dat),
-                   
-                   w0 = w0Matrix(getNDomains(dat)),
-                   w = wMatrix(getNDomains(dat)),
-                   
-                   Z = reZ(getNDomains(dat), getNTime(dat)),
-                   Z1 = reZ1(getNDomains(dat), getNTime(dat)),
-                   beta = c(1, 1),
-                   sigma = c(1, 1),
-                   rho = c(0.5, 0.5),
-                   sigmaE = sigmaE,
-                   tol = 1e-3,
-                   psiFunction = my.psi,
-                   K = 0.71)
-
-
-
 #' optimizeBeta
 #' 
 #' @description find optimal beta coefficients for given variance parameters
@@ -137,8 +87,10 @@ optimizeSigma <- function(modelSpecs) {
       return(optSig1^2 + optSig2^2)
     }
   }
-    
-  modelSpecs$sigma <- optim(par=modelSpecs$sigma, fn = optimizerClosure(modelSpecs))$par
+  
+  modelSpecs$sigma <- optim(par=modelSpecs$sigma, 
+                            fn = optimizerClosure(modelSpecs),
+                            method = modelSpecs$method)$par
   return(modelSpecs)
 }
 
@@ -188,7 +140,9 @@ optimizeRho <- function(modelSpecs) {
     }
   }
   
-  modelSpecs$rho <- optim(par=modelSpecs$rho, fn = optimizerClosure(modelSpecs))$par
+  modelSpecs$rho <- optim(par=modelSpecs$rho, 
+                          fn = optimizerClosure(modelSpecs),
+                          method = modelSpecs$method)$par
   return(modelSpecs)
 }
 
@@ -210,12 +164,3 @@ optimizeParameters <- function(modelSpecs) {
   }
   return(modelSpecs)
 }
-
-tmp <- optimizeParameters(modelSpecs)
-
-tmp <- optimizeBeta(tmp)
-summary(lm(y~x, data = dat))
-tmp$beta
-tmp$sigma
-tmp$rho
-
