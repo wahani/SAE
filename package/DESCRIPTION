@@ -1,0 +1,11 @@
+Package: SAE
+Type: Package
+Title: Small Area Estimation
+Version: 0.1
+Date: 2013-07-19
+Author: Sebastian Warnholz
+Maintainer: Sebastian Warnholz <Sebastian.Warnholz@fu-berlin.de>
+Description: Nothing to say
+License: Don't know yet
+Depends: spatioTemporalData, MASS
+LazyLoad: No
