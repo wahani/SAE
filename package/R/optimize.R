@@ -155,12 +155,19 @@ optimizeRho <- function(modelSpecs) {
 #' @param modelSpecs list with all necessary components for estimation
 #' 
 optimizeParameters <- function(modelSpecs) {
-  for (i in 1:2) {
-    cat(paste("beta = ", modelSpecs$beta, "sigma = ", modelSpecs$sigma, "rho = ", modelSpecs$rho, "\n"))
+  
+  checkCriterion <- function(modelSpecs, oldParams) 
+    all((c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho) - oldParams)^2 > modelSpecs$tol)
+  
+  oldParams <- rep(100000, length(modelSpecs$beta) + 4)
+  
+  while (checkCriterion(modelSpecs, oldParams)) {
+    #cat(paste("beta = ", modelSpecs$beta, "sigma = ", modelSpecs$sigma, "rho = ", modelSpecs$rho, "\n"))
+    oldParams <- c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho)
+    cat(".")
     modelSpecs <- optimizeBeta(modelSpecs)
     modelSpecs <- optimizeRho(modelSpecs)
-    modelSpecs <- optimizeSigma(modelSpecs)
-    
+    modelSpecs <- optimizeSigma(modelSpecs)  
   }
   return(modelSpecs)
 }
