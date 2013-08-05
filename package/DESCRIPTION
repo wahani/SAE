@@ -7,5 +7,5 @@ Author: Sebastian Warnholz
 Maintainer: Sebastian Warnholz <Sebastian.Warnholz@fu-berlin.de>
 Description: Nothing to say
 License: Don't know yet
-Depends: spatioTemporalData, MASS
+Depends: spatioTemporalData, MASS, testthat
 LazyLoad: No

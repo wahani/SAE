@@ -93,13 +93,13 @@ updateDerivativesClosure <- function(nDomains, nTime, Z1, W) {
   
   #####
   
-  function(sarCorr, sigma1, arCorr, sigma2, Ome1, Ome2) {
+  function(sarCorr, sigma1, arCorr, sigma2, Ome1, Ome2, parSet = c("sigma", "rho")) {
     #Return a list with the updated derivatives of V
-    
-    list(derVSigma1 = derVSigma1(Ome1),
-         derVSarCorr = derVSarCorr(sigma1, Ome1, sarCorr),
-         derVSigma2 = derVSigma2(Ome2),
-         derVArCorr = derVArCorr(sigma2, arCorr, Ome2))
+    if (parSet == "sigma") return(
+      list(derVSigma1 = derVSigma1(Ome1),         
+           derVSigma2 = derVSigma2(Ome2))) else return(         
+             list(derVSarCorr = derVSarCorr(sigma1, Ome1, sarCorr),
+                  derVArCorr = derVArCorr(sigma2, arCorr, Ome2)))
   }
 }
 
