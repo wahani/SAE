@@ -5,10 +5,13 @@ rm(list= ls())
 # Installiere Paket
 # utils::install.packages(pkgs="../spatioTemporalData/spatioTemporalData_1.0.zip", 
 #                         repos = NULL)
+# utils::install.packages(pkgs="../spatioTemporalData/spatioTemporalData_1.0.tar.gz", 
+#                         repos = NULL)
+
 
 require(spatioTemporalData)
 require(SAE)
-set.seed(2)
+set.seed(3)
 setup <- simSetupMarhuenda(nDomains=50, nTime=10, sarCorr=0.5, arCorr=0.5)
 output <- simRunMarhuenda(setup)
 dat <- slot(output[[1]], "data")[[1]]
@@ -38,7 +41,7 @@ modelSpecs <- list(y = XY$y,
                    tol = 1e-3,
                    psiFunction = psiOne,
                    K = 0.71,
-                   method = "SANN")
+                   method = "Nelder-Mead")
 
 tmp <- optimizeParameters(modelSpecs)
 

@@ -157,7 +157,7 @@ optimizeRho <- function(modelSpecs) {
 optimizeParameters <- function(modelSpecs) {
   
   checkCriterion <- function(modelSpecs, oldParams) 
-    all((c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho) - oldParams)^2 > modelSpecs$tol)
+    !all((c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho) - oldParams)^2 < modelSpecs$tol)
   
   oldParams <- rep(100000, length(modelSpecs$beta) + 4)
   
