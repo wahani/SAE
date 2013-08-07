@@ -50,6 +50,7 @@ set.seed(3)
 setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
 output <- simRunMarhuenda(setup)
 dat <- slot(output[[1]], "data")[[1]]
-result <- fitRSTEBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+result <- fitSTREBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+summary(result)
 }
 

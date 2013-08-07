@@ -30,11 +30,8 @@ sigmaE <- slot(output[[1]], "sigma")
 
 fit <- fitSTREBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
 
-summary.fitSTREBLUP <- function(fit) {
-  out <- matrix(c(fit$beta, fit$sigma, fit$rho), ncol = 1)
-  rownames(out) <- c(rownames(fit$beta), "sigmaSquaredSAR", "sigmaSquaredAR", "rhoSAR", "rhoAR")
-  colnames(out) <- "estimated coefficient"
-  as.table(out)
-}
-class(fit)
+modelFit <- fitSTEBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+
+summary(modelFit)
 summary(fit)
+

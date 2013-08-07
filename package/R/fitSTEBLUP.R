@@ -1,12 +1,52 @@
-#####################################################################
-###           Spatio-temporal Fay Herriot Models
-###                   SAMPLE Project
-###
-### Author:    Yolanda Marhuenda (y.marhuenda@umh.es)
-### File name: FitSpatioTemporalFH.R 
-### Updated:   January 20th, 2011
-###       
-#####################################################################
+#' fitSTEBLUP
+#' 
+#' @description Wrapper function for the estimation of the spatio-temporal-FH model as in Marhuenda (2012). Uses the
+#' function \code{FitSpatioTemporalFH} provided by Sample Deliverable 22: Software on Small Area Estimation
+#' 
+#' @param formula formula for the fixed effects part
+#' @param dat data with dependent and independent variable as they are used in formula. The data should 
+#' contain a variable \code{Domain} and \code{Time} indicating the domain and time period for each observation respectively
+#' @param beta, sigma, rho start values for the parameters
+#' @param sigmaSamplingError True variances for the sampling errors
+#' @param nDomains the number of domains. Will be determined by default, see \code{dat}
+#' @param nTime the number of time periods. Will be determined by default, see \code{dat}
+#' @param w0 proximity matrix
+#' @param w at the moment row-standardized proximity matrix
+#' @param tol numerical tolerance for algorithm
+#' @param method method used by the function \code{\link{optim}}
+#' @param maxIter maximal number of iterations - ignored in the function optim. Relevant for "global" algorithm and for the
+#' optimization of beta
+#'
+#'@examples require(spatioTemporalData); require(SAE)
+#' set.seed(3)
+#' setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
+#' output <- simRunMarhuenda(setup) 
+#' dat <- slot(output[[1]], "data")[[1]]
+#' result <- fitSTEBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+#' summary(result)
+fitSTEBLUP <- function(formula, dat, beta, sigma, rho, 
+                                sigmaSamplingError = unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime)),
+                                nDomains = getNDomains(dat),
+                                nTime = getNTime(dat),
+                                w0 = w0Matrix(nDomains), 
+                                w = wMatrix(nDomains),
+                                tol = 1e-3, method = "Nelder-Mead", maxIter = 500) {
+  
+  modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
+  
+  modelFit <- FitSpatioTemporalFH("B", modelSpecs$x, modelSpecs$y, modelSpecs$nDomains, modelSpecs$nTime,
+                                  modelSpecs$sigmaSamplingError,
+                                  theta0 = matrix(c(modelSpecs$sigma[1], modelSpecs$rho[1], modelSpecs$sigma[2], modelSpecs$rho[2])),
+                                  W = modelSpecs$w, MAXITER = modelSpecs$maxIter, PRECISION = modelSpecs$tol,
+                                  confidence = 0.95)
+  
+  output <- list(estimates = data.frame(estimates = modelFit$estimates),
+                 beta = as.matrix(modelFit$beta["coef"]),
+                 sigma = as.numeric(modelFit$theta[c(1, 3), "estimate"]),
+                 rho = as.numeric(modelFit$theta[c(2, 4), "estimate"]))
+  class(output) <- c("fitSTEBLUP", "fitSTREBLUP", "list")
+  output
+}
 
 FitSpatioTemporalFH <- function(model,X,y,nD,nT,sigma2dt,theta0,
                                 W,MAXITER,PRECISION,confidence)
@@ -352,6 +392,5 @@ FitSpatioTemporalFH <- function(model,X,y,nD,nT,sigma2dt,theta0,
   
   return (result)
 }
-
 
 
