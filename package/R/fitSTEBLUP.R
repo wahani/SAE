@@ -10,12 +10,11 @@
 #' @param sigmaSamplingError True variances for the sampling errors
 #' @param nDomains the number of domains. Will be determined by default, see \code{dat}
 #' @param nTime the number of time periods. Will be determined by default, see \code{dat}
-#' @param w0 proximity matrix
+#' @param w0 proximity matrix - not needed in the call to \code{FitSpatioTemporalFH}
 #' @param w at the moment row-standardized proximity matrix
 #' @param tol numerical tolerance for algorithm
-#' @param method method used by the function \code{\link{optim}}
-#' @param maxIter maximal number of iterations - ignored in the function optim. Relevant for "global" algorithm and for the
-#' optimization of beta
+#' @param method method used by the function \code{\link{optim}} - not needed in the call to \code{FitSpatioTemporalFH}
+#' @param maxIter maximal number of iterations
 #'
 #'@examples require(spatioTemporalData); require(SAE)
 #' set.seed(3)
