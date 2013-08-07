@@ -7,10 +7,12 @@ optimizeBeta <- function(modelSpecs) {
   #update necessary components
   Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
   Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-  A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime)
+  A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
+               modelSpecs$sigmaSamplingError)
   V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-  Vinv <- qr.solve(V)
-  #Vinv <- updateSolvedV(sarCorr=, sigma1=, arCorr=, A=, Ome1=, Z1=, )
+  Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
+                        arCorr=modelSpecs$rho[2], A=A, Ome1=Ome1, Z1=modelSpecs$Z1)
+  
   sqrtU <- updateSqrtU(V=V)
   sqrtUinv <- diag(1/diag(sqrtU))
   
@@ -24,7 +26,7 @@ optimizeBeta <- function(modelSpecs) {
   iter <- 1
   
   # Begin NR-Algorithm - see Issue 1 - Paper - Numerical Stability
-  while(all((newBeta - beta)^2 > modelSpecs$tol) || iter == 1) {
+  while(all((newBeta - beta)^2 > modelSpecs$tol) || iter == 1 & iter < modelSpecs$maxIter) {
     
     beta <- newBeta
     
@@ -60,10 +62,12 @@ optimizeSigma <- function(modelSpecs) {
       
       Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
       Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-      A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime)
+      A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
+                   modelSpecs$sigmaSamplingError)
       V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-      Vinv <- qr.solve(V)
-      #Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=, arCorr=, A=, Ome1=, Z1=, )
+      #Vinv <- qr.solve(V)
+      Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
+                            arCorr=modelSpecs$rho[2], A=A, Ome1=Ome1, Z1=modelSpecs$Z1)
       sqrtU <- updateSqrtU(V=V)
       sqrtUinv <- diag(1/diag(sqrtU))
       
@@ -111,10 +115,12 @@ optimizeRho <- function(modelSpecs) {
       modelSpecs$rho <<- rho
       Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
       Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-      A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime)
+      A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
+                   modelSpecs$sigmaSamplingError)
       V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-      Vinv <- qr.solve(V)
-      #Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=, arCorr=, A=, Ome1=, Z1=, )
+      #Vinv <- qr.solve(V)
+      Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
+                            arCorr=modelSpecs$rho[2], A=A, Ome1=Ome1, Z1=modelSpecs$Z1)
       sqrtU <- updateSqrtU(V=V)
       sqrtUinv <- diag(1/diag(sqrtU))
       
@@ -163,13 +169,37 @@ optimizeParameters <- function(modelSpecs) {
   
   oldParams <- rep(100000, length(modelSpecs$beta) + 4)
   
-  while (checkCriterion(modelSpecs, oldParams)) {
+  iter <- 1
+  while (checkCriterion(modelSpecs, oldParams) & iter < modelSpecs$maxIter) {
     #cat(paste("beta = ", modelSpecs$beta, "sigma = ", modelSpecs$sigma, "rho = ", modelSpecs$rho, "\n"))
     oldParams <- c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho)
     cat(".")
     modelSpecs <- optimizeBeta(modelSpecs)
     modelSpecs <- optimizeRho(modelSpecs)
     modelSpecs <- optimizeSigma(modelSpecs)  
+    iter <- iter + 1
   }
+  return(modelSpecs)
+}
+
+
+#' estimateRE
+#' 
+#' @description This function estimates the BLUP for the RE-Part, given the results
+#' of the estimation of all parameters - \code{\link{optimizeParameters}}
+#' 
+#' @param modelSpecs list with all necessary components for estimation
+#' 
+estimateRE <- function(modelSpecs) {
+  Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
+  Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
+  A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
+               modelSpecs$sigmaSamplingError)
+  V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
+  Vinv <- qr.solve(V)
+  
+  u1 <- modelSpecs$sigma[1] * Ome1 %*% t(modelSpecs$Z1) %*% Vinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
+  u2 <- modelSpecs$sigma[2] * omega2Diag(Ome2, modelSpecs$nDomains)  %*% Vinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
+  modelSpecs$u <- data.frame(u1, u2)
   return(modelSpecs)
 }

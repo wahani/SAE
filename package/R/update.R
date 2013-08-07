@@ -32,18 +32,11 @@ updateV <- function(sigma1, Ome1, A, Z1) sigma1 * Z1 %*% Ome1 %*% t(Z1) + A
 #' 
 #' @description Marhuenda et. al. (2013): page 311 Remark 1
 #'
-updateA <- function(sigma2, Ome2, nDomains, nTime) {
+updateA <- function(sigma2, Ome2, nDomains, nTime, sigmaSamplingError) {
   
-  Omega2Diag <- function(Ome2) {
-    require(Matrix)
-    Ome2Diag <- list()
-    Ome2Diag[1:nDomains] <- list(Ome2)
-    as.matrix(bdiag(Ome2Diag))
-  }
-  
-  diagTemp <- sigma2 * Omega2Diag(Ome2)
-  samplingErrors <- unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime))
-  diag(diagTemp) <- diag(diagTemp) + samplingErrors
+  diagTemp <- sigma2 * omega2Diag(Ome2, nDomains)
+  #samplingErrors <- unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime))
+  diag(diagTemp) <- diag(diagTemp) + sigmaSamplingError
   diagTemp
 }
 
@@ -79,17 +72,10 @@ updateDerivativesClosure <- function(nDomains, nTime, Z1, W) {
     (1 - arCorr^2)^(-1) * omega2 + 2 * arCorr * Ome2 * (1 - arCorr^2)^(-1)
   }
   
-  Omega2Diag <- function(Ome2) {
-    require(Matrix)
-    Ome2Diag <- list()
-    Ome2Diag[1:nDomains] <- list(Ome2)
-    as.matrix(bdiag(Ome2Diag))
-  }
-  
   derVSigma1 <- function(Ome1) Z1 %*% Ome1 %*% t(Z1)
   derVSarCorr <- function(sigma1, Ome1, sarCorr) (-1) * sigma1 * Z1 %*% Ome1 %*% (-W-t(W) + 2 * sarCorr * t(W) %*% W) %*% Ome1 %*% t(Z1)
-  derVSigma2 <- function(Ome2) Omega2Diag(Ome2)
-  derVArCorr <- function(sigma2, arCorr, Ome2) sigma2 * Omega2Diag(derOmega2ArCorr(arCorr, Ome2))
+  derVSigma2 <- function(Ome2, nDomains) omega2Diag(Ome2, nDomains)
+  derVArCorr <- function(sigma2, arCorr, Ome2, nDomains) sigma2 * omega2Diag(derOmega2ArCorr(arCorr, Ome2), nDomains)
   
   #####
   
@@ -97,9 +83,9 @@ updateDerivativesClosure <- function(nDomains, nTime, Z1, W) {
     #Return a list with the updated derivatives of V
     if (parSet == "sigma") return(
       list(derVSigma1 = derVSigma1(Ome1),         
-           derVSigma2 = derVSigma2(Ome2))) else return(         
+           derVSigma2 = derVSigma2(Ome2, nDomains))) else return(         
              list(derVSarCorr = derVSarCorr(sigma1, Ome1, sarCorr),
-                  derVArCorr = derVArCorr(sigma2, arCorr, Ome2)))
+                  derVArCorr = derVArCorr(sigma2, arCorr, Ome2, nDomains)))
   }
 }
 

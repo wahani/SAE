@@ -11,45 +11,13 @@ rm(list= ls())
 
 require(spatioTemporalData)
 require(SAE)
-set.seed(1)
-setup <- simSetupMarhuenda(nDomains=50, nTime=10, sarCorr=0.5, arCorr=0.5)
+set.seed(3)
+setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
 output <- simRunMarhuenda(setup)
 dat <- slot(output[[1]], "data")[[1]]
 sigmaE <- slot(output[[1]], "sigma")
 
 # Prepare Data
-prepareData <- function(dat, sigmaE, beta, sigma, rho) {
-  
-  dat <- dat[order(dat$Domain, dat$Time), ]
-  XY <- makeXY(y ~ x, dat)
-  
-  modelSpecs <- list(y = XY$y,
-                     x = XY$x,
-                     nDomains = getNDomains(dat),
-                     nTime = getNTime(dat),
-                     
-                     w0 = w0Matrix(getNDomains(dat)),
-                     w = wMatrix(getNDomains(dat)),
-                     
-                     Z = reZ(getNDomains(dat), getNTime(dat)),
-                     Z1 = reZ1(getNDomains(dat), getNTime(dat)),
-                     beta = beta,
-                     sigma = sigma,
-                     rho = rho,
-                     sigmaE = sigmaE,
-                     tol = 1e-3,
-                     psiFunction = psiOne,
-                     K = 0.71,
-                     method = "Nelder-Mead")
-  return(modelSpecs)
-}
-
-modelSpecs <- prepareData(dat, sigmaE, c(0,1), c(2,1), c(0.5,0.5))
-out <- optimizeParameters(modelSpecs)
-
-
-
-
 # system.time(tmp <- optimizeParameters(modelSpecs))
 
 # Rprof(tmp <- tempfile())
@@ -60,5 +28,13 @@ out <- optimizeParameters(modelSpecs)
 # 
 # profileSummary$by.total
 
+fit <- fitSTREBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
 
-
+summary.fitSTREBLUP <- function(fit) {
+  out <- matrix(c(fit$beta, fit$sigma, fit$rho), ncol = 1)
+  rownames(out) <- c(rownames(fit$beta), "sigmaSquaredSAR", "sigmaSquaredAR", "rhoSAR", "rhoAR")
+  colnames(out) <- "estimated coefficient"
+  as.table(out)
+}
+class(fit)
+summary(fit)

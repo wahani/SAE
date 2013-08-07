@@ -1,3 +1,16 @@
+
+omega2Diag <- function(Ome2, nDomains) {
+  out <- matrix(0, ncol = ncol(Ome2) * nDomains, nrow = ncol(Ome2) * nDomains)
+  for (i in 1:nDomains) {
+    #browser()
+    ind <- 1:ncol(Ome2) + (i-1) * ncol(Ome2)
+    
+    out[ind, ind] <- Ome2
+  }
+  out
+}
+
+
 #' makeXY
 #' 
 #' @description extract respone vector and design matrix from data

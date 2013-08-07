@@ -1,0 +1,51 @@
+#' fitSTREBLUP
+#' 
+#' @description Wrapper function for the estimation of the spatio-temporal-robust-EBLUP
+#' 
+#' @param formula formula for the fixed effects part
+#' @param dat data with dependent and independent variable as they are used in formula. The data should 
+#' contain a variable \code{Domain} and \code{Time} indicating the domain and time period for each observation respectively
+#' @param beta, sigma, rho start values for the parameters
+#' @param sigmaSamplingError True variances for the sampling errors
+#' @param nDomains the number of domains. Will be determined by default, see \code{dat}
+#' @param nTime the number of time periods. Will be determined by default, see \code{dat}
+#' @param w0 proximity matrix
+#' @param w at the moment row-standardized proximity matrix
+#' @param tol numerical tolerance for algorithm
+#' @param method method used by the function \code{\link{optim}}
+#' @param maxIter maximal number of iterations - ignored in the function optim. Relevant for "global" algorithm and for the
+#' optimization of beta
+#'
+#'@examples require(spatioTemporalData); require(SAE)
+#' set.seed(3)
+#' setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
+#' output <- simRunMarhuenda(setup) 
+#' dat <- slot(output[[1]], "data")[[1]]
+#' result <- fitSTREBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+#' summary(result)
+fitSTREBLUP <- function(formula, dat, beta, sigma, rho, 
+                        sigmaSamplingError = unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime)),
+                        nDomains = getNDomains(dat),
+                        nTime = getNTime(dat),
+                        w0 = w0Matrix(nDomains), 
+                        w = wMatrix(nDomains),
+                        tol = 1e-3, method = "Nelder-Mead", maxIter = 500) {
+  
+  modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
+  modelFit <- optimizeParameters(modelSpecs)
+  modelFit <- estimateRE(modelFit)
+  
+  output <- list(data = data.frame(xb = modelFit$x %*% modelFit$beta, modelFit$u),
+                 beta = modelFit$beta,
+                 sigma = modelFit$sigma,
+                 rho = modelFit$rho)
+  class(output) <- c("fitSTREBLUP", "list")
+  output
+}
+
+summary.fitSTREBLUP <- function(fit) {
+  out <- matrix(c(fit$beta, fit$sigma, fit$rho), ncol = 1)
+  rownames(out) <- c(rownames(fit$beta), "sigmaSquaredSAR", "sigmaSquaredAR", "rhoSAR", "rhoAR")
+  colnames(out) <- "estimated coefficient"
+  as.table(out)
+}
