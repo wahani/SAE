@@ -12,7 +12,7 @@ rm(list= ls())
 require(spatioTemporalData)
 require(SAE)
 set.seed(3)
-setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
+setup <- simSetupMarhuenda(nDomains=100, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
 output <- simRunMarhuenda(setup)
 dat <- slot(output[[1]], "data")[[1]]
 sigmaE <- slot(output[[1]], "sigma")
@@ -20,18 +20,15 @@ sigmaE <- slot(output[[1]], "sigma")
 # Prepare Data
 # system.time(tmp <- optimizeParameters(modelSpecs))
 
-# Rprof(tmp <- tempfile())
-# out <- optimizeParameters(modelSpecs)
-# Rprof()
-# profileSummary <- summaryRprof(tmp)
-# unlink(tmp)
-# 
-# profileSummary$by.total
+Rprof(tmp <- tempfile())
+out <- fitSTEBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+Rprof()
+profileSummary <- summaryRprof(tmp)
+unlink(tmp)
 
-fit <- fitSTREBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+profileSummary$by.total
 
-modelFit <- fitSTEBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+# fit <- fitSTREBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
+# modelFit <- fitSTEBLUP(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
 
-summary(modelFit)
-summary(fit)
-
+fit <- fitEB(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
