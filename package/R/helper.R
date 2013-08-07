@@ -14,6 +14,8 @@ makeXY <- function(formula, data){
        x = x)
 }
 
+getNDomains <- function(dat) length(unique(dat$Domain))
+getNTime <- function(dat) length(unique(dat$Time))
 
 #' psiOne
 #' 

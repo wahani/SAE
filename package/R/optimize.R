@@ -25,7 +25,9 @@ optimizeBeta <- function(modelSpecs) {
   
   # Begin NR-Algorithm - see Issue 1 - Paper - Numerical Stability
   while(all((newBeta - beta)^2 > modelSpecs$tol) || iter == 1) {
+    
     beta <- newBeta
+    
     resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$x %*% beta)
     dOfBeta <- diag(as.numeric(modelSpecs$psiFunction(u = resid, deriv = 1)))
     tmp3 <- tmp1 %*% dOfBeta %*% modelSpecs$x

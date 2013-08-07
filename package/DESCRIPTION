@@ -9,3 +9,4 @@ Description: Nothing to say
 License: Don't know yet
 Depends: spatioTemporalData, MASS, testthat
 LazyLoad: No
+ByteCompile: TRUE
