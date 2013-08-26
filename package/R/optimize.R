@@ -173,7 +173,7 @@ optimizeParameters <- function(modelSpecs) {
   while (checkCriterion(modelSpecs, oldParams) & iter < modelSpecs$maxIter) {
     #cat(paste("beta = ", modelSpecs$beta, "sigma = ", modelSpecs$sigma, "rho = ", modelSpecs$rho, "\n"))
     oldParams <- c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho)
-    cat(".")
+    consoleOutput(modelSpecs$consoleOutput)
     modelSpecs <- optimizeBeta(modelSpecs)
     modelSpecs <- optimizeRho(modelSpecs)
     modelSpecs <- optimizeSigma(modelSpecs)  

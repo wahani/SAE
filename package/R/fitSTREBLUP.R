@@ -32,13 +32,26 @@ fitSTREBLUP <- function(formula, dat, beta, sigma, rho,
                         tol = 1e-3, method = "Nelder-Mead", maxIter = 500) {
   
   modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
-  modelFit <- optimizeParameters(modelSpecs)
-  modelFit <- estimateRE(modelFit)
   
-  output <- list(data = data.frame(xb = modelFit$x %*% modelFit$beta, modelFit$u),
+  #try-catch handling for parameter estimation
+  modelFit <- try(optimizeParameters(modelSpecs), silent = TRUE)
+  modelFit <- if (class(modelFit) != "try-error") 
+    estimateRE(modelFit) else {
+      modelSpecs$beta <- numeric(length(modelSpecs$beta))
+      modelSpecs$sigma <- numeric(length(modelSpecs$sigma))
+      modelSpecs$rho <- numeric(length(modelSpecs$rho))
+      modelSpecs
+    }
+      
+  
+  dat <- dat[order(dat$Domain, dat$Time), ]
+  
+  output <- list(estimates = data.frame(yHat = modelFit$x %*% modelFit$beta + 
+                                          modelFit$u$u1 + modelFit$u$u2),
                  beta = modelFit$beta,
                  sigma = modelFit$sigma,
                  rho = modelFit$rho)
+  
   class(output) <- c("fitSTREBLUP", "list")
   output
 }

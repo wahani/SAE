@@ -1,3 +1,19 @@
+combineSimResults <- function(simResults, functionNames) {
+  simSetup <- Reduce("+", x=simResults)
+  datList <- slot(simSetup, "data")
+  datList <- lapply(datList, 
+                    function(dat, functionNames) {
+                      names(dat)[grepl("yHat", names(dat))] <- paste("yHat", functionNames, sep = ".")
+                      dat
+                    }
+                    ,
+                    functionNames = functionNames)
+  
+  slot(simSetup, "data") <- datList
+  simSetup
+}
+
+consoleOutput <- function(consoleOutput) if (consoleOutput) cat(".") else NULL
 
 omega2Diag <- function(Ome2, nDomains) {
   out <- matrix(0, ncol = ncol(Ome2) * nDomains, nrow = ncol(Ome2) * nDomains)

@@ -4,3 +4,4 @@
       .libPaths(paste(getwd(), "libLinux", sep = "/"))
     }
 }
+.First()

@@ -33,13 +33,21 @@ fitSTEBLUP <- function(formula, dat, beta, sigma, rho,
   
   modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
   
-  modelFit <- FitSpatioTemporalFH("B", modelSpecs$x, modelSpecs$y, modelSpecs$nDomains, modelSpecs$nTime,
+  modelFit <- try(FitSpatioTemporalFH("B", modelSpecs$x, modelSpecs$y, modelSpecs$nDomains, modelSpecs$nTime,
                                   modelSpecs$sigmaSamplingError,
                                   theta0 = matrix(c(modelSpecs$sigma[1], modelSpecs$rho[1], modelSpecs$sigma[2], modelSpecs$rho[2])),
                                   W = modelSpecs$w, MAXITER = modelSpecs$maxIter, PRECISION = modelSpecs$tol,
-                                  confidence = 0.95)
+                                  confidence = 0.95),
+                  silent = TRUE)
   
-  output <- list(estimates = data.frame(estimates = modelFit$estimates),
+  if (class(modelFit) == "try-error") {
+      modelFit <- 
+        list(estimates = numeric(length(nDomains*nTime)),
+             beta = list("coef" = numeric(length(modelSpecs$beta))),
+             theta <- data.frame("estimate" = numeric(length(c(modelSpecs$sigma, modelSpecs$rho)))))
+    }
+  
+  output <- list(estimates = data.frame(yHat = modelFit$estimates),
                  beta = as.matrix(modelFit$beta["coef"]),
                  sigma = as.numeric(modelFit$theta[c(1, 3), "estimate"]),
                  rho = as.numeric(modelFit$theta[c(2, 4), "estimate"]))
