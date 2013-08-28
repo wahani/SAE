@@ -37,9 +37,55 @@ setTrueY <- function(simSetup) {
 require(spatioTemporalData)
 require(SAE)
 set.seed(3)
-setup <- simSetupMarhuenda(nDomains=30, nTime=20, sarCorr=0.5, arCorr=0.5, n = 50)
+setup <- simSetupMarhuenda(nDomains=100, nTime=10, sarCorr=0.5, arCorr=0.5, n = 50)
 output <- simRunMarhuenda(setup)[[1]]
 output <- setTrueY(output)
+datList <- output@data
+
+results <- mclapply(datList,
+         function(dat) {
+           fit <- fitSTREBLUP(dat = dat, 
+                             formula = y ~ x, 
+                             beta = c(0,1), 
+                             sigma = c(1,1), 
+                             rho = c(0.5,0.5))
+           fit
+         }, 
+         mc.cores = if (grepl("Windows", Sys.getenv("OS"))) 
+           1L else detectCores(),
+         mc.preschedule = FALSE)
+
+results1 <- mclapply(datList,
+                    function(dat) {
+                      fit <- fitSTEBLUP(dat = dat, 
+                                         formula = y ~ x, 
+                                         beta = c(0,1), 
+                                         sigma = c(1,1), 
+                                         rho = c(0.5,0.5))
+                      fit
+                    }, 
+                    mc.cores = if (grepl("Windows", Sys.getenv("OS"))) 
+                      1L else detectCores(),
+                    mc.preschedule = FALSE)
+
+
+
+tmp <- lapply(results1, function(tmp)
+  data.frame("value" = c(tmp$beta, tmp$sigma, tmp$rho),
+             "parameter" = c("beta1", "beta2", "sigma1", "sigma2", "rho1", "rho2"),
+             "model" = "ST"))
+tmp <- do.call(rbind, tmp)
+evalData$model <- "STR" 
+evalData <- rbind(evalData, tmp)
+require(ggplot2)
+resultPlot <- ggplot(evalData, aes(x = value, fill = model, colour = model)) + 
+  geom_density(alpha = 0.1) + 
+  facet_grid(parameter~., scales="free_y") + 
+  labs(title = "Scenario: 100 Domains, 10 Time, TrueParameters: betas: 0, 1, \n rhos: 0.5, 0.5 sigmas: 1, 1, n = 50")
+
+ggsave(filename = "ParameterRobustNonRobustDensities.pdf", width = 10, height = 5)
+
+
 
 fitFunction <- c("fitSTEBLUP", "fitSTREBLUP")
 
