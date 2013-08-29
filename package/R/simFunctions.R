@@ -20,7 +20,7 @@ fitSimSetup <- function(fitFunction, simSetup) {
                              fit$estimates
                            }, 
                              mc.cores = if (grepl("Windows", Sys.getenv("OS"))) 
-                               1L else detectCores(),
+                               1L else (detectCores() - 5),
                              mc.preschedule = FALSE)
   
   predictionList[grepl("try-error", sapply(predictionList, class))] <- 
