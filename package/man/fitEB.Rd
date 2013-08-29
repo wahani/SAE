@@ -59,6 +59,6 @@ setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 20
 output <- simRunMarhuenda(setup)
 dat <- slot(output[[1]], "data")[[1]]
 result <- fitEB(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
-summary(result)
+#summary(result)
 }
 

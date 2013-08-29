@@ -46,8 +46,7 @@ fitSTREBLUP <- function(formula, dat, beta, sigma, rho,
   
   dat <- dat[order(dat$Domain, dat$Time), ]
   
-  output <- list(estimates = data.frame(yHat = modelFit$x %*% modelFit$beta + 
-                                          modelFit$u$u1 + modelFit$u$u2),
+  output <- list(estimates = data.frame(yHat = modelFit$x %*% modelFit$beta + modelFit$u),
                  beta = modelFit$beta,
                  sigma = modelFit$sigma,
                  rho = modelFit$rho)

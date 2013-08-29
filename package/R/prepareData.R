@@ -33,7 +33,6 @@ prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSa
                      consoleOutput = TRUE,
                      
                      # "Empty" Vector of Random Effects Estimates
-                     u = data.frame(u1 = numeric(nDomains * nTime),
-                                    u2 = numeric(nDomains * nTime)))
+                     u = numeric(nDomains * nTime))
   return(modelSpecs)
 }

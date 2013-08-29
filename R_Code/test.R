@@ -37,72 +37,9 @@ setTrueY <- function(simSetup) {
 require(spatioTemporalData)
 require(SAE)
 set.seed(3)
-setup <- simSetupMarhuenda(nDomains=100, nTime=10, sarCorr=0.5, arCorr=0.5, n = 50)
+setup <- simSetupMarhuenda(nDomains=40, nTime=5, sarCorr=0.5, arCorr=0.5, n = 15)
 output <- simRunMarhuenda(setup)[[1]]
 output <- setTrueY(output)
-datList <- output@data
-
-results <- mclapply(datList,
-         function(dat) {
-           fit <- fitSTREBLUP(dat = dat, 
-                             formula = y ~ x, 
-                             beta = c(0,1), 
-                             sigma = c(1,1), 
-                             rho = c(0.5,0.5))
-           fit
-         }, 
-         mc.cores = if (grepl("Windows", Sys.getenv("OS"))) 
-           1L else detectCores(),
-         mc.preschedule = FALSE)
-
-results1 <- mclapply(datList,
-                    function(dat) {
-                      fit <- fitSTEBLUP(dat = dat, 
-                                         formula = y ~ x, 
-                                         beta = c(0,1), 
-                                         sigma = c(1,1), 
-                                         rho = c(0.5,0.5))
-                      fit
-                    }, 
-                    mc.cores = if (grepl("Windows", Sys.getenv("OS"))) 
-                      1L else detectCores(),
-                    mc.preschedule = FALSE)
-
-
-
-tmp <- lapply(results1, function(tmp)
-  data.frame("value" = c(tmp$beta, tmp$sigma, tmp$rho),
-             "parameter" = c("beta1", "beta2", "sigma1", "sigma2", "rho1", "rho2"),
-             "model" = "ST"))
-tmp <- do.call(rbind, tmp)
-evalData$model <- "STR" 
-evalData <- rbind(evalData, tmp)
-require(ggplot2)
-resultPlot <- ggplot(evalData, aes(x = value, fill = model, colour = model)) + 
-  geom_density(alpha = 0.1) + 
-  facet_grid(parameter~., scales="free_y") + 
-  labs(title = "Scenario: 100 Domains, 10 Time, TrueParameters: betas: 0, 1, \n rhos: 0.5, 0.5 sigmas: 1, 1, n = 50")
-
-ggsave(filename = "ParameterRobustNonRobustDensities.pdf", width = 10, height = 5)
-
-
-results1
-results[[1]]$estimates - results1[[1]]$estimates
-
-
-
-tmp1 <- prepareData(formula=y~x, dat=datList[[1]], nDomains=100, nTime=10, 
-            beta=as.numeric(results1[[1]]$beta), 
-            sigma=as.numeric(results1[[1]]$sigma), 
-            rho = as.numeric(results1[[1]]$rho), 
-            sigmaSamplingError = unlist(lapply(1:100, seSigmaClosure(100, 10), t = 1:10)), 
-            w0=w0Matrix(nDomains=100), w=wMatrix(100), 
-            tol = 0.0003, method = "", maxIter = 1)
-
-tmp1 <- estimateRE(tmp1)
-
-tmp1$x%*%tmp1$beta + tmp1$u$u1 + tmp1$u$u2 - results1[[1]]$estimates
-
 
 fitFunction <- c("fitSTEBLUP", "fitSTREBLUP")
 
@@ -113,13 +50,21 @@ dataList <- simResults@data
 mse <- do.call("rbind", lapply(dataList, 
                         function(dat) {
                           dat <- subset(dat, Time == max(dat$Time))
-                          data.frame(mse.ST = mean((dat$trueY - dat$yHat.fitSTEBLUP)^2),
-                                     mse.STR = mean((dat$trueY - dat$yHat.fitSTREBLUP)^2),
-                                     mse.direct = mean((dat$y - dat$yHat.fitSTREBLUP)^2))
+                          data.frame(mse.ST = calcRRMSE(dat$trueY, dat$yHat.fitSTEBLUP),
+                                     mse.STR = calcRRMSE(dat$trueY, dat$yHat.fitSTREBLUP),
+                                     mse.direct = calcRRMSE(dat$trueY, dat$y))
                         }
 ))
 
 lapply(mse, mean, na.rm = T)
+
+
+calcRRMSE <- function(trueValues, estimates) {
+  if (all(estimates == 0)) estimates <- NA
+  sqrt(mean(((trueValues-estimates)/trueValues)^2))
+}
+  
+
 
 
 # Prepare Data

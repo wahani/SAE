@@ -40,12 +40,14 @@ fitSTEBLUP <- function(formula, dat, beta, sigma, rho,
                                   confidence = 0.95),
                   silent = TRUE)
   
-  if (class(modelFit) == "try-error") {
+  if (class(modelFit) == "try-error" | !modelFit$convergence | !modelFit$validtheta) {
       modelFit <- 
         list(estimates = numeric(length(nDomains*nTime)),
              beta = list("coef" = numeric(length(modelSpecs$beta))),
              theta <- data.frame("estimate" = numeric(length(c(modelSpecs$sigma, modelSpecs$rho)))))
     }
+  
+  
   
   output <- list(estimates = data.frame(yHat = modelFit$estimates),
                  beta = as.matrix(modelFit$beta["coef"]),
