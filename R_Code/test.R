@@ -43,7 +43,7 @@ output <- setTrueY(output)
 
 fitFunction <- c("fitSTEBLUP", "fitSTREBLUP")
 
-system.time(simResults <- getSimResults(output, fitFunction))
+simResults <- getSimResults(output, fitFunction)
 
 dataList <- simResults@data
 
