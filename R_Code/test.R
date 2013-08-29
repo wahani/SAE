@@ -86,6 +86,23 @@ resultPlot <- ggplot(evalData, aes(x = value, fill = model, colour = model)) +
 ggsave(filename = "ParameterRobustNonRobustDensities.pdf", width = 10, height = 5)
 
 
+results1
+results[[1]]$estimates - results1[[1]]$estimates
+
+
+
+tmp1 <- prepareData(formula=y~x, dat=datList[[1]], nDomains=100, nTime=10, 
+            beta=as.numeric(results1[[1]]$beta), 
+            sigma=as.numeric(results1[[1]]$sigma), 
+            rho = as.numeric(results1[[1]]$rho), 
+            sigmaSamplingError = unlist(lapply(1:100, seSigmaClosure(100, 10), t = 1:10)), 
+            w0=w0Matrix(nDomains=100), w=wMatrix(100), 
+            tol = 0.0003, method = "", maxIter = 1)
+
+tmp1 <- estimateRE(tmp1)
+
+tmp1$x%*%tmp1$beta + tmp1$u$u1 + tmp1$u$u2 - results1[[1]]$estimates
+
 
 fitFunction <- c("fitSTEBLUP", "fitSTREBLUP")
 

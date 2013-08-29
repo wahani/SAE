@@ -198,8 +198,10 @@ estimateRE <- function(modelSpecs) {
   V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
   Vinv <- qr.solve(V)
   
-  u1 <- modelSpecs$sigma[1] * Ome1 %*% t(modelSpecs$Z1) %*% Vinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
-  u2 <- modelSpecs$sigma[2] * omega2Diag(Ome2, modelSpecs$nDomains)  %*% Vinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
+  tmp1 <- Vinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
+  
+  u1 <- modelSpecs$sigma[1] * Ome1 %*% t(modelSpecs$Z1) %*% tmp1
+  u2 <- modelSpecs$sigma[2] * omega2Diag(Ome2, modelSpecs$nDomains)  %*% tmp1
   modelSpecs$u <- data.frame(u1, u2)
   return(modelSpecs)
 }
