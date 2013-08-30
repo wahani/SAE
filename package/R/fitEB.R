@@ -39,7 +39,7 @@ fitEB <- function(formula, dat, beta, sigma, rho,
   
   modelFit <- fitFH(modelSpecs$x, modelSpecs$y, modelSpecs$sigmaSamplingError, method = "REML", MAXITER = modelSpecs$maxIter)
   
-  output <- list(estimates = data.frame(estimates = modelFit$EBpredictor),
+  output <- list(estimates = data.frame(yHat = modelFit$EBpredictor),
                  beta = modelFit$modelcoefficients,
                  sigma = modelSpecs$sigma,
                  rho = modelSpecs$rho)

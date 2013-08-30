@@ -14,8 +14,8 @@ setTrueY <- function(simSetup) {
 }
 
 calcRRMSE <- function(trueValues, estimates) {
-  if (all(estimates == 0)) estimates <- NA
-  sqrt(mean(((trueValues-estimates)/trueValues)^2))
+  estimates[estimates == 0] <- NA
+  sqrt(mean(((trueValues-estimates)/trueValues)^2, na.rm = T))
 }
 
 combineSimResults <- function(simResults, functionNames) {

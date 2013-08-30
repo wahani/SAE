@@ -1,7 +1,13 @@
 # Functions for simulation
 fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
   # function definition
-  addPrediction <- function(dat, prediction) data.frame(dat, yHat = prediction)
+  addPrediction <- function(dat, prediction) {
+    if (max(dat$Domain) == nrow(prediction)) {
+      dat$yHat <- NA
+      dat[dat$Time == max(dat$Time), "yHat"] <- prediction 
+      return(dat)
+    } else return(data.frame(dat, yHat = prediction))
+  }
   
   #
   startBeta <- simSetup@beta
