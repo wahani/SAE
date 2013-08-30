@@ -20,7 +20,7 @@ require(SAE)
 require(parallelTools)
 
 set.seed(4)
-setup <- simSetupMarhuenda(nDomains=40, nTime=10, sarCorr=0.5, arCorr=0.5, n = 20)
+setup <- simSetupMarhuenda(nDomains=40, nTime=10, sarCorr=0.5, arCorr=0.5, n = 15)
 output <- simRunMarhuenda(setup)[[1]]
 output <- setTrueY(output)
 
@@ -28,7 +28,7 @@ fitFunction <- c("fitEB", "fitSTEBLUP", "fitSTREBLUP")
 
 simResults <- getSimResults(output, fitFunction)
 save(simResults, file = "Workspaces/tmp1.RData")
-
+load(file = "Workspaces/simResults1.RData")
 
 getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE") {
   require(reshape2)
@@ -60,10 +60,10 @@ dat1 <- getEvalCrit(simResults, "calcAABIAS")
 dat2 <- getEvalCrit(simResults)
 require(ggplot2)
 ggplot(dat2, aes(y = calcRRMSE, x = model)) + geom_boxplot() + coord_flip() #  + ylim(c(0, 5))
-ggplot(dat, aes(y = calcAABIAS, x = model)) + geom_boxplot() + coord_flip()
+ggplot(dat1, aes(y = calcAABIAS, x = model)) + geom_boxplot() + coord_flip()
 
 
-
+table(dat1$model[is.na(dat1$calcAABIAS)])
 
 
 

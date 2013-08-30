@@ -36,8 +36,8 @@ fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
   simSetup
 }
 
-getSimResults <- function(simSetup, fitFunction) {
+getSimResults <- function(simSetup, fitFunction, mc.cores = detectCores()) {
   funList <- lapply(fitFunction, match.fun)
-  simResults <- lapply(funList, fitSimSetup, simSetup = simSetup)
+  simResults <- lapply(funList, fitSimSetup, simSetup = simSetup, mc.cores = mc.cores)
   combineSimResults(simResults, fitFunction)
 }
