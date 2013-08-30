@@ -8,32 +8,6 @@ rm(list= ls())
 # utils::install.packages(pkgs="../spatioTemporalData/spatioTemporalData_1.0.tar.gz", 
 #                         repos = NULL)
 
-setTrueY <- function(simSetup) {
-  # funciton-definition
-  trueY <- function(dat, sigmaE) {
-    dat$trueY <- dat$y - sigmaE 
-    dat
-  }
-  
-  #
-  sigmaE <- as.data.frame(slot(simSetup, "sigma"))
-  dat <- slot(simSetup, "data")
-  dataList <- mapply("trueY", dat, sigmaE, SIMPLIFY = FALSE)
-  slot(simSetup, "data") <- dataList
-  simSetup
-}
-
-"+.simSetup" <- function(x, y) {
-  datListX <- slot(x, "data")
-  datListY <- slot(y, "data")
-  
-  datList <- mapply(function(dat1, dat2) data.frame(dat1, dat2$yHat),
-                    datListX, datListY, SIMPLIFY = FALSE)
-  
-  slot(x, "data") <- datList
-  x
-}
-
 require(spatioTemporalData)
 require(SAE)
 set.seed(3)
@@ -59,10 +33,7 @@ mse <- do.call("rbind", lapply(dataList,
 lapply(mse, mean, na.rm = T)
 
 
-calcRRMSE <- function(trueValues, estimates) {
-  if (all(estimates == 0)) estimates <- NA
-  sqrt(mean(((trueValues-estimates)/trueValues)^2))
-}
+
   
 
 

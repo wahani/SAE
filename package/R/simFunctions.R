@@ -1,5 +1,5 @@
 # Functions for simulation
-fitSimSetup <- function(fitFunction, simSetup) {
+fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
   # function definition
   addPrediction <- function(dat, prediction) data.frame(dat, yHat = prediction)
   
@@ -10,18 +10,18 @@ fitSimSetup <- function(fitFunction, simSetup) {
   
   datList <- slot(simSetup, "data")
   
-  predictionList <- mclapply(datList,
-                           function(dat) {
-                             fit <- fitFunction(dat = dat, 
-                                                formula = y ~ x, 
-                                                beta = startBeta, 
-                                                sigma = startSigma, 
-                                                rho = startRho)
-                             fit$estimates
-                           }, 
-                             mc.cores = if (grepl("Windows", Sys.getenv("OS"))) 
-                               1L else (detectCores() - 5),
-                             mc.preschedule = FALSE)
+  predictionList <- parallelTools::mclapply(datList,
+                                            function(dat) {
+                                              fit <- fitFunction(dat = dat, 
+                                                                 formula = y ~ x, 
+                                                                 beta = startBeta, 
+                                                                 sigma = startSigma, 
+                                                                 rho = startRho)
+                                              fit$estimates
+                                            }, 
+                                            mc.cores = mc.cores,
+                                            mc.preschedule = FALSE, 
+                                            packageToLoad = c("spatioTemporalData", "SAE"))
   
   predictionList[grepl("try-error", sapply(predictionList, class))] <- 
     list(rep(NA, simSetup@nDomains * simSetup@nTime))

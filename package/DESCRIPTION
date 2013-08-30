@@ -7,6 +7,6 @@ Author: Sebastian Warnholz
 Maintainer: Sebastian Warnholz <Sebastian.Warnholz@fu-berlin.de>
 Description: Nothing to say
 License: Don't know yet
-Depends: spatioTemporalData, MASS, testthat
+Depends: spatioTemporalData, MASS, testthat, parallelTools
 LazyLoad: No
 ByteCompile: TRUE
