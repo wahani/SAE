@@ -19,7 +19,7 @@ output <- simRunMarhuenda(setup)
 output <- lapply(output, setTrueY)[-4]
 
 simResults <- lapply(output, getSimResults, 
-                     fitFunction = c("fitSTREBLUP"), 
+                     fitFunction = c("fitEB", "fitSTEBLUP", "fitSTREBLUP"), 
                      mc.cores = 25)
 
 save(simResults, file = "Workspaces/simResults3.RData")
