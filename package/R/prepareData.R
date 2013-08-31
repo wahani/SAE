@@ -17,9 +17,9 @@ prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSa
                      Z1 = reZ1(getNDomains(dat), getNTime(dat)),
                      
                      # Initial Parameters
-                     beta = beta,
-                     sigma = sigma,
-                     rho = rho,
+                     beta = beta + c(0.01, 0.01),
+                     sigma = sigma + c(0.01, 0.01),
+                     rho = rho + c(0.01, 0.01),
                      
                      # True Variance Parameters for Sampling Error
                      sigmaSamplingError = sigmaSamplingError,

@@ -56,7 +56,7 @@ calcAABIAS <- function(trueValues, estimates) {
 }
 
 
-dat1 <- getEvalCrit(simResults, "calcAABIAS")
+dat1 <- getEvalCrit(simResults[[1]], "calcAABIAS")
 dat2 <- getEvalCrit(simResults)
 require(ggplot2)
 ggplot(dat2, aes(y = calcRRMSE, x = model)) + geom_boxplot() + coord_flip() #  + ylim(c(0, 5))
