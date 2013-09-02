@@ -67,8 +67,8 @@ plot.simSetup <- function(simSetup) {
 
 plots <- lapply(simResults, plot)
 
-plots[[3]]$boxplotAABIAS
-plots[[3]]$boxplotRRMSE + ylim(c(0,0.5))
+plots[[1]]$boxplotAABIAS
+plots[[1]]$boxplotRRMSE + ylim(c(0,0.5))
 
 sapply(split(log(plots[[3]]$boxplotRRMSE$data$calcRRMSE), plots[[3]]$boxplotRRMSE$data$model), 
       mean)

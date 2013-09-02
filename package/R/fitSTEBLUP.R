@@ -28,7 +28,7 @@ fitSTEBLUP <- function(formula, dat, beta, sigma, rho,
                                 nDomains = getNDomains(dat),
                                 nTime = getNTime(dat),
                                 w0 = w0Matrix(nDomains), 
-                                w = wMatrix(nDomains),
+                                w = w0 / rowSums(w0),
                                 tol = 1e-3, method = "Nelder-Mead", maxIter = 500) {
   
   modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)

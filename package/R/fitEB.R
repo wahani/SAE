@@ -29,12 +29,12 @@ fitEB <- function(formula, dat, beta, sigma, rho,
                   nDomains = getNDomains(dat),
                   nTime = getNTime(dat),
                   w0 = w0Matrix(nDomains), 
-                  w = wMatrix(nDomains),
+                  w = w0 / rowSums(w0),
                   tol = 1e-3, method = "Nelder-Mead", maxIter = 500) {
   
-  dat <- subset(dat, Time == max(Time))
   sigmaSamplingError <- sigmaSamplingError[dat$Time == max(dat$Time)]
-  
+  dat <- subset(dat, Time == max(Time))
+    
   modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
   
   modelFit <- fitFH(modelSpecs$x, modelSpecs$y, modelSpecs$sigmaSamplingError, method = "REML", MAXITER = modelSpecs$maxIter)

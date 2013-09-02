@@ -22,7 +22,9 @@ fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
                                                                  formula = y ~ x, 
                                                                  beta = startBeta, 
                                                                  sigma = startSigma, 
-                                                                 rho = startRho)
+                                                                 rho = startRho,
+                                                                 sigmaSamplingError = simSetup@sigmaSE,
+                                                                 w0 = simSetup@neighbourHood)
                                               fit$estimates
                                             }, 
                                             mc.cores = mc.cores,
