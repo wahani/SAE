@@ -25,7 +25,7 @@
 #' result <- fitEB(y~x, dat, c(0,1), c(1,1), c(0.5,0.5))
 #' #summary(result)
 fitEB <- function(formula, dat, beta, sigma, rho, 
-                  sigmaSamplingError = unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime)),
+                  sigmaSamplingError = seSigmaClosure(nDomains, nTime)(),
                   nDomains = getNDomains(dat),
                   nTime = getNTime(dat),
                   w0 = w0Matrix(nDomains), 

@@ -35,7 +35,7 @@ updateV <- function(sigma1, Ome1, A, Z1) sigma1 * Z1 %*% Ome1 %*% t(Z1) + A
 updateA <- function(sigma2, Ome2, nDomains, nTime, sigmaSamplingError) {
   
   diagTemp <- sigma2 * omega2Diag(Ome2, nDomains)
-  #samplingErrors <- unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime))
+  #samplingErrors <- seSigmaClosure(nDomains, nTime)()
   diag(diagTemp) <- diag(diagTemp) + sigmaSamplingError
   diagTemp
 }
