@@ -4,52 +4,49 @@
 #   require(devtools)
 #   if(!require(parallelTools)) install_github(repo="parallelTools", username = "wahani", subdir = "package")
 # }
-require(devtools)
+# require(devtools)
 # install_github(repo="parallelTools", username = "wahani", subdir = "package")
 # install_github(repo="spatioTemporalData", username = "wahani", subdir = "package")
 # 
-# 
+#
+
+"+.simSetup" <- function(x, y) {
+  datListX <- slot(x, "data")
+  datListY <- slot(y, "data")
+  
+  datList <- mapply(function(dat1, dat2) data.frame(dat1, dat2$yHat),
+                    datListX, datListY, SIMPLIFY = FALSE)
+  
+  slot(x, "data") <- datList
+  x
+}
+
 require(SAE)
 # require(parallelTools)
 # 
-# set.seed(4)
-setup <- simSetupMarhuenda(nDomains=40, nTime=10, sarCorr=0.5, arCorr=0.5, n = 15)
-output <- simRunSetup(setup)[[1]]
+set.seed(4)
+output <- simRunContamination(nDomains=40, nTime=10, sarCorr=0.5, arCorr=0.5, n = 20,
+                             spatialCont = list(sigma = 1, sigmaCont = 10, nDomainsCont = 2),
+                             temporalCont = list(sigma = 1, sigmaCont = 10, nDomainsCont = 2),
+                             spatioTemporalMessup = TRUE)
 
-# output <- setTrueY(output)
-# 
-# fitFunction <- c("fitEB", "fitSTEBLUP", "fitSTREBLUP")
-# 
-# simResults <- getSimResults(output, fitFunction)
-# save(simResults, file = "Workspaces/tmp1.RData")
-# load(file = "Workspaces/simResults1.RData")
-
-dat <- getEvalCrit(simResults[[2]], "calcAABIAS")
-dat$cont <- factor(dat$Domain %in% 97:100, labels = c("normal", "cont"))
-
-aggregate(AABIAS ~ cont + model, dat, mean)
-
-
+simResults <- lapply(output, getSimResults, 
+                     fitFunction = c("fitEB", "fitSTEBLUP", "fitSTREBLUP"), # , "fitSTREBLUP" fitSTEBLUP
+                     mc.cores = 4)
 
 plot.simSetup <- function(simSetup) {
   require(ggplot2)
   
-  dat1 <- getEvalCrit(simSetup, "calcAABIAS")
-  dat2 <- getEvalCrit(simSetup, "calcRRMSE")
-  dat3 <- getEvalCrit(simSetup, "calcRBIAS")
+  datList <- lapply(c("calcRRMSE", "calcRBIAS"), getEvalCrit, simResults = simSetup)
   
-  list("boxplotRRMSE" = ggplot(dat2, aes(y = calcRRMSE, x = model)) + geom_boxplot() + coord_flip(),
-       "boxplotAABIAS" = ggplot(dat1, aes(y = calcAABIAS, x = model)) + geom_boxplot() + coord_flip(),
-       "boxplotRBIAS" = ggplot(dat3, aes(y = calcRBIAS, x = model)) + geom_boxplot() + coord_flip()
-  )
+  list("RRMSE" = ggplot(datList[[1]], aes(y = RRMSE, x = model)) + geom_boxplot() + coord_flip(),
+       "RBIAS" = ggplot(datList[[2]], aes(y = RBIAS, x = model)) + geom_boxplot() + coord_flip())
 }
 
 plots <- lapply(simResults, plot)
 
-plots[[1]]$boxplotAABIAS 
-plots[[1]]$boxplotRRMSE + scale_y_log10()
-plots[[1]]$boxplotRBIAS + ylim(c(-0.2, 0.2))
-
+plots[[1]]$RRMSE + ylim(c(0, 10))
+plots[[1]]$RBIAS + ylim(c(-0.2, 0.2))
 
 sapply(split(log(plots[[3]]$boxplotRRMSE$data$calcRRMSE), plots[[3]]$boxplotRRMSE$data$model), 
       mean)

@@ -5,9 +5,13 @@
   psiOne(u, k = 1.345, deriv = 0)
 }
 \arguments{
-  \item{u,}{k, deriv see \code{\link{MASS::psi.huber}}}
+  \item{u}{}
+
+  \item{k}{}
+
+  \item{deriv}{}
 }
 \description{
-  Psi-function
+  Psi-function - see \code{\link{MASS::psi.huber}}
 }
 

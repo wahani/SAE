@@ -17,6 +17,7 @@
 #' @param method method used by the function \code{\link{optim}} - not needed in the call to \code{fitFH}
 #' @param maxIter maximal number of iterations
 #'
+#' @export
 #'@examples require(spatioTemporalData); require(SAE)
 #' set.seed(3)
 #' setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)

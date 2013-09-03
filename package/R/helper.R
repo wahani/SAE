@@ -48,9 +48,11 @@ getNTime <- function(dat) length(unique(dat$Time))
 
 #' psiOne
 #' 
-#' @description Psi-function
+#' @description Psi-function - see \code{\link{MASS::psi.huber}}
 #' 
-#' @param u, k, deriv see \code{\link{MASS::psi.huber}}
+#' @param u
+#' @param k
+#' @param deriv 
 #' 
 psiOne <- function(u,k = 1.345,deriv = 0){
   var.weights = rep(1, length(u))

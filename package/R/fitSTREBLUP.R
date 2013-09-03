@@ -15,8 +15,10 @@
 #' @param method method used by the function \code{\link{optim}}
 #' @param maxIter maximal number of iterations - ignored in the function optim. Relevant for "global" algorithm and for the
 #' optimization of beta
+#' 
+#' @export
 #'
-#'@examples require(spatioTemporalData); require(SAE)
+#' @examples require(spatioTemporalData); require(SAE)
 #' set.seed(3)
 #' setup <- simSetupMarhuenda(nDomains=30, nTime=5, sarCorr=0.5, arCorr=0.5, n = 200)
 #' output <- simRunMarhuenda(setup) 
