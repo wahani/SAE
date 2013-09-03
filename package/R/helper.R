@@ -1,22 +1,3 @@
-setTrueY <- function(simSetup) {
-  # funciton-definition
-  trueY <- function(dat, sigmaE) {
-    dat$trueY <- dat$y - sigmaE 
-    dat
-  }
-  
-  #
-  sigmaE <- as.data.frame(slot(simSetup, "sigma"))
-  dat <- slot(simSetup, "data")
-  dataList <- mapply("trueY", dat, sigmaE, SIMPLIFY = FALSE)
-  slot(simSetup, "data") <- dataList
-  simSetup
-}
-
-calcRRMSE <- function(trueValues, estimates) {
-  estimates[estimates == 0] <- NA
-  sqrt(mean(((trueValues-estimates)/trueValues)^2, na.rm = T))
-}
 
 combineSimResults <- function(simResults, functionNames) {
   simSetup <- Reduce("+", x=simResults)
@@ -45,7 +26,6 @@ omega2Diag <- function(Ome2, nDomains) {
   }
   out
 }
-
 
 #' makeXY
 #' 

@@ -3,9 +3,9 @@
 \title{fitSTEBLUP}
 \usage{
   fitSTEBLUP(formula, dat, beta, sigma, rho,
-    sigmaSamplingError = unlist(lapply(1:nDomains, seSigmaClosure(nDomains, nTime), t = 1:nTime)),
+    sigmaSamplingError = seSigmaClosure(nDomains, nTime)(),
     nDomains = getNDomains(dat), nTime = getNTime(dat),
-    w0 = w0Matrix(nDomains), w = wMatrix(nDomains),
+    w0 = w0Matrix(nDomains), w = w0/rowSums(w0),
     tol = 0.001, method = "Nelder-Mead", maxIter = 500)
 }
 \arguments{
