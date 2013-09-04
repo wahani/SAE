@@ -2,7 +2,8 @@
 \alias{getEvalCrit}
 \title{evaluate simulation results}
 \usage{
-  getEvalCrit(simResults, critFunctionName = "calcRRMSE")
+  getEvalCrit(simResults, critFunctionName = "calcRRMSE",
+    scenario = "")
 }
 \arguments{
   \item{simResults}{a simSetup object with simulation

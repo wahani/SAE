@@ -4,7 +4,7 @@
 #' @param critFunctionName a function name. Function with two arguments. First is
 #' the vector of true values, second the vector of predicitons.
 #' @export
-getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE") {
+getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE", scenario = "") {
   require(reshape2)
   critFunction <- match.fun(critFunctionName)
   data <- subset(do.call("rbind", simResults@data), Time == simResults@nTime)
@@ -35,6 +35,7 @@ getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE") {
   result1$Domain <- rep(1:simResults@nDomains, length(vars)+1)
   #browser()
   result1$n <- melt(result[, grepl("^n", names(result))], variable.name="model", value.name = "n")$n
+  result1$Scenario <- scenario
   result1
 }
 

@@ -1,0 +1,63 @@
+Vorläufige Ergebnisse
+========================================================
+
+Es kommen noch einige Änderungen wegen der Generierung der Daten, deshalb sind das nur vorläufige Ergebnisse.
+
+Scenario: 
+- Regressor kommt aus einer Gleichverteilung zwischen -1 und 1
+- RandomEffect nicht kontaminiert kommen aus einem SAR bzw. AR Prozess mit 0 bzw. 0.5 Korrelation und Varianz = 1 bzw. 9 für kontaminierte Daten. 5% der Beobachtungen sind Ausreißer
+- 100 Domains - 10 Zeitperioden - 200 Wiederholungen
+
+
+```{r, echo=FALSE, message=FALSE}
+rm(list = ls())
+setwd("H:\\R\\Projekte\\SAE")
+.libPaths(paste(getwd(), "/libWin", sep = ""))
+
+require(SAE)
+
+load("Workspaces//simResults5.RData")
+
+plot.simSetup <- function(simSetup, scenario = "") {
+  require(ggplot2)
+  
+  datList <- lapply(c("calcRRMSE", "calcRBIAS"), getEvalCrit, simResults = simSetup, scenario = scenario)
+  
+  list("RRMSE" = ggplot(datList[[1]], aes(y = RRMSE, x = model)) + geom_boxplot() + coord_flip(),
+       "RBIAS" = ggplot(datList[[2]], aes(y = RBIAS, x = model)) + geom_boxplot() + coord_flip())
+}
+
+plotSimResultList <- function(simResultsList, scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, p1, p2)"), critFunctionName) {
+  require(ggplot2)
+  evalDataList <- mapply(getEvalCrit, simResultsList, scenarioList, critFunctionName = critFunctionName, SIMPLIFY = FALSE)
+  evalData <- do.call("rbind", evalDataList)
+  
+  if (critFunctionName == "calcRBIAS")
+    return(ggplot(evalData) + geom_boxplot(aes(x = model, y = RBIAS)) +  
+             geom_hline(aes(inetercept = 0), colour = "red") + 
+             coord_flip() + facet_grid(Scenario~.))
+  
+  if (critFunctionName == "calcRRMSE")
+    return(ggplot(evalData) + geom_boxplot(aes(x = model, y = RRMSE)) +  
+             coord_flip() + facet_grid(Scenario~.))
+}
+```
+
+Etwas erschreckend sind die extremen Werte. Ich hoffe das wird sich noch etwas ändern, wenn ich die Datengenerierung angepasst habe. Das Modell "Direct" sind einfach die Sampling Errors. Für jedes Modell ein Wert pro Area. Für das STFH-Modell habe ich immer wieder das Problem, das nicht für alle Datensätze Ergebnisse vorliegen. bei diesem durchlauf habe ich für den STFH 198 erfolgreiche durchläufe, für 2 gibt es kein Ergebnis...
+
+```{r, fig.width=10, fig.height=5, message=FALSE}
+ggRBIAS <- plotSimResultList(simResults[-c(2,3)], critFunctionName = "calcRBIAS")
+ggRBIAS
+```
+
+```{r, fig.width=10, fig.height=5, message=FALSE}
+ggRBIAS + coord_flip(ylim=c(-2, 2))
+```
+
+```{r, fig.width=10, fig.height=5, message=FALSE}
+ggRRMSE <- plotSimResultList(simResults[-c(2,3)], critFunctionName = "calcRRMSE")
+ggRRMSE
+ggRRMSE + coord_flip(ylim=c(0, 40))
+```
+
+
