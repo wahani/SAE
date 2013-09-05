@@ -10,4 +10,4 @@ libLinux/*
 libWin/*
 
 #Workspaces/*
-.Rd
+#*.Rd

@@ -1,0 +1,6 @@
+*.png
+*.html
+*.md
+
+# Except this file
+!.gitignore
