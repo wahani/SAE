@@ -53,3 +53,8 @@ calcRRMSE <- function(trueValues, estimates) {
   estimates[estimates == 0] <- NA
   sqrt(mean(as.numeric((trueValues-estimates)/trueValues)^2, na.rm = T))
 }
+
+calcMSE <- function(trueValues, estimates) {
+  estimates[estimates == 0] <- NA
+  mean(as.numeric(trueValues-estimates)^2, na.rm = T)
+}
