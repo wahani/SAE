@@ -31,7 +31,7 @@ svv00 <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0), arCor
                               temporalCont = list(sigma = 1, sigmaCont = 9, nDomainsCont = 2),
                               spatioTemporalMessup = TRUE)
 
-svvpp <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0.9), arCorr=c(0.9), n = n,
+svvpp <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0.5), arCorr=c(0.5), n = n,
                              spatialCont = list(sigma = 1, sigmaCont = 9, nDomainsCont = 3),
                              temporalCont = list(sigma = 1, sigmaCont = 9, nDomainsCont = 2),
                              spatioTemporalMessup = TRUE)
@@ -41,7 +41,7 @@ s0000 <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0), arCor
                                    temporalCont = list(sigma = 1, sigmaCont = 1, nDomainsCont = 0),
                                    spatioTemporalMessup = FALSE)
 
-s00pp <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0.9), arCorr=c(0.9), n = n,
+s00pp <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0.5), arCorr=c(0.5), n = n,
                              spatialCont = list(sigma = 1, sigmaCont = 1, nDomainsCont = 0),
                              temporalCont = list(sigma = 1, sigmaCont = 1, nDomainsCont = 0),
                              spatioTemporalMessup = FALSE)
@@ -49,7 +49,7 @@ s00pp <- simRunContamination(nDomains=nDomains, nTime=nTime, sarCorr=c(0.9), arC
 output <- c(svv00, s00pp, s0000, s00pp, recursive=TRUE)
 
 simResults <- lapply(output, getSimResults, 
-                     fitFunction = c("fitEB", "fitSTEBLUP","fitSTREBLUP"),  # "fitEB", "fitSTEBLUP", fitSTREBLUP
+                     fitFunction = c("fitSTREBLUP"),  # "fitEB", "fitSTEBLUP", fitSTREBLUP
                      mc.cores = 27)
 
 save(simResults, file = "Workspaces/simResults6.RData")
