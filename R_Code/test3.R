@@ -1,4 +1,4 @@
-# rm(list= ls())
+rm(list= ls())
 # 
 # if(.Platform$OS.type == "windows") {
 #   require(devtools)
@@ -8,6 +8,7 @@
 # install_github(repo="parallelTools", username = "wahani", subdir = "package")
 # install_github(repo="spatioTemporalData", username = "wahani", subdir = "package")
 # 
+#install.packages("../spatioTemporalData/spatioTemporalData_1.1.1.tar.gz")
 #
 
 "+.simSetup" <- function(x, y) {
@@ -24,15 +25,15 @@
 require(SAE)
 # require(parallelTools)
 # 
-set.seed(4)
-output <- simRunContamination(nDomains=40, nTime=10, sarCorr=0.5, arCorr=0.5, n = 20,
-                             spatialCont = list(sigma = 1, sigmaCont = 10, nDomainsCont = 2),
-                             temporalCont = list(sigma = 1, sigmaCont = 10, nDomainsCont = 2),
+set.seed(3)
+output <- simRunContamination(nDomains=50, nTime=10, sarCorr=0.5, arCorr=0.5, n = 50,
+                             spatialCont = list(sigma = 1, sigmaCont = 9, nDomainsCont = 2),
+                             temporalCont = list(sigma = 1, sigmaCont = 9, nDomainsCont = 2),
                              spatioTemporalMessup = TRUE)
 
 simResults <- lapply(output, getSimResults, 
                      fitFunction = c("fitEB", "fitSTEBLUP", "fitSTREBLUP"), # , "fitSTREBLUP" fitSTEBLUP
-                     mc.cores = 4)
+                     mc.cores = 27)
 
 plot.simSetup <- function(simSetup) {
   require(ggplot2)
@@ -43,10 +44,13 @@ plot.simSetup <- function(simSetup) {
        "RBIAS" = ggplot(datList[[2]], aes(y = RBIAS, x = model)) + geom_boxplot() + coord_flip())
 }
 
+ggplot(getEvalCrit(simResults[[1]], critFunctionName="calcRBIAS")) + 
+  geom_line(aes(x = Domain, y = RBIAS))
+
 plots <- lapply(simResults, plot)
 
-plots[[1]]$RRMSE + ylim(c(0, 10))
-plots[[1]]$RBIAS + ylim(c(-0.2, 0.2))
+plots[[1]]$RRMSE + coord_flip(ylim=c(0,20))
+plots[[1]]$RBIAS + coord_flip(ylim=c(-2,2))
 
 sapply(split(log(plots[[3]]$boxplotRRMSE$data$calcRRMSE), plots[[3]]$boxplotRRMSE$data$model), 
       mean)

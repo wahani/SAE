@@ -38,7 +38,15 @@ fitEB <- function(formula, dat, beta, sigma, rho,
     
   modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
   
-  modelFit <- fitFH(modelSpecs$x, modelSpecs$y, modelSpecs$sigmaSamplingError, method = "REML", MAXITER = modelSpecs$maxIter)
+  modelFit <- try(fitFH(modelSpecs$x, modelSpecs$y, modelSpecs$sigmaSamplingError, method = "REML", MAXITER = modelSpecs$maxIter), 
+                  silent = TRUE)
+  
+  #try-catch handling for parameter estimation
+  modelFit <- if (class(modelFit) == "try-error" || modelFit$convergence) {
+    modelSpecs$modelcoefficients <- numeric(length(modelSpecs$beta))
+    modelSpecs$EBpredictor <- numeric(length(nDomains))
+    modelSpecs
+  } else modelFit
   
   output <- list(estimates = data.frame(yHat = modelFit$EBpredictor),
                  beta = modelFit$modelcoefficients,
