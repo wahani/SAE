@@ -42,7 +42,7 @@ s00pp <- simRunContamination(nDomains=100, nTime=10, sarCorr=c(0.9), arCorr=c(0.
                              temporalCont = list(sigma = 1, sigmaCont = 1, nDomainsCont = 0),
                              spatioTemporalMessup = FALSE)
 
-output <- c(svv00, s00pp, s0000, s00pp)
+output <- c(svv00, s00pp, s0000, s00pp, recursive=TRUE)
 
 simResults <- lapply(output, getSimResults, 
                      fitFunction = c("fitEB", "fitSTEBLUP","fitSTREBLUP"),  # "fitEB", "fitSTEBLUP", fitSTREBLUP
