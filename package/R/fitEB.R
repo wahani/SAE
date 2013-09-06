@@ -42,7 +42,7 @@ fitEB <- function(formula, dat, beta, sigma, rho,
                   silent = TRUE)
   
   #try-catch handling for parameter estimation
-  modelFit <- if (class(modelFit) == "try-error" || modelFit$convergence) {
+  modelFit <- if (class(modelFit) == "try-error" || !modelFit$convergence) {
     modelSpecs$modelcoefficients <- numeric(length(modelSpecs$beta))
     modelSpecs$EBpredictor <- numeric(length(nDomains))
     modelSpecs
