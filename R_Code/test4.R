@@ -1,7 +1,7 @@
 rm(list = ls())
 require(SAE)
 
-load("Workspaces//simResults6.RData")
+load("Workspaces//simResults9.RData")
 
 # # Für 6 und 7 8
 # load("Workspaces//simResults6.RData")
@@ -59,21 +59,37 @@ plotSimResultList <- function(simResultsList, scenarioList = list("(v1, v2, 0, 0
   if (critFunctionName == "calcMSE")
     return(ggplot(evalData) + geom_boxplot(aes(x = model, y = MSE)) +  
              coord_flip() + facet_grid(Scenario~.))
+  
+  if (critFunctionName == "calcAABIAS")
+    return(ggplot(evalData) + geom_boxplot(aes(x = model, y = AABIAS)) +  
+             coord_flip() + facet_grid(Scenario~.))
+  
+  if (critFunctionName == "calcBIAS")
+    return(ggplot(evalData) + geom_boxplot(aes(x = model, y = BIAS)) +  
+             coord_flip() + facet_grid(Scenario~.))
 }
 
 
 # simResults6.RData
-ggRBIAS <- plotSimResultList(simResults, critFunctionName = "calcRBIAS", 
-                             scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
-ggRBIAS + coord_flip(ylim=c(-0.1, 0.1))
-
-ggRRMSE <- plotSimResultList(simResults, critFunctionName = "calcRRMSE", 
-                             scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
-ggRRMSE + coord_flip(ylim=c(0, 0.5))
-
-ggMSE <- plotSimResultList(simResults, critFunctionName = "calcMSE", 
-                             scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
-ggMSE + coord_flip(ylim=c(0, 5))
+# ggRBIAS <- plotSimResultList(simResults, critFunctionName = "calcRBIAS", 
+#                              scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
+# ggRBIAS + coord_flip(ylim=c(-0.1, 0.1))
+# 
+# ggRRMSE <- plotSimResultList(simResults, critFunctionName = "calcRRMSE", 
+#                              scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
+# ggRRMSE + coord_flip(ylim=c(0, 0.5))
+# 
+# ggMSE <- plotSimResultList(simResults, critFunctionName = "calcMSE", 
+#                              scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
+# ggMSE + coord_flip(ylim=c(0, 5))
+# 
+# ggAABIAS <- plotSimResultList(simResults, critFunctionName = "calcAABIAS", 
+#                            scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
+# ggAABIAS + coord_flip(ylim=c(0, 5))
+# 
+# ggBIAS <- plotSimResultList(simResults, critFunctionName = "calcBIAS", 
+#                               scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, 0.5, 0.5)", "(0, 0, 0, 0)", "(0, 0, 0.5, 0.5)"))
+# ggBIAS + coord_flip(ylim=c(0, 5))
 
 
 # # simResults4.RData
@@ -99,12 +115,15 @@ ggMSE + coord_flip(ylim=c(0, 5))
 # ggRRMSE <- plotSimResultList(simResults, critFunctionName = "calcMSE", scenarioList = list("(0, 0, 0, 0)", "(0, 0, 0, 0.5)", "(0, 0, 0.5, 0)"))
 # ggRRMSE + coord_flip(ylim=c(0, 5))
 
-# # simResults1.RData + 2
-# ggRBIAS <- plotSimResultList(list(simResults), critFunctionName = "calcRBIAS", scenarioList = list("(0, 0, p1, p2)"))
+# simResults1.RData + 2
+# ggRBIAS <- plotSimResultList(list(simResults[[1]]), critFunctionName = "calcRRMSE", scenarioList = list("(0, 0, p1, p2)"))
 # ggRBIAS + coord_flip(ylim=c(-0.1, 0.1))
 # 
 # ggRRMSE <- plotSimResultList(list(simResults), critFunctionName = "calcRRMSE", scenarioList = list("(0, 0, p1, p2)"))
 # ggRRMSE + coord_flip(ylim=c(0, 1))
+# 
+# ggAABIAS <- plotSimResultList(list(simResults), critFunctionName = "calcAABIAS", scenarioList = list("(0, 0, p1, p2)"))
+# ggAABIAS + coord_flip(ylim=c(-0.1, 0.1))
 
 
 # #simResults5.Rdata

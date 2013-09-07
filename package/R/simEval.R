@@ -8,6 +8,8 @@ getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE", scenario = "
   require(reshape2)
   critFunction <- match.fun(critFunctionName)
   data <- subset(do.call("rbind", simResults@data), Time == simResults@nTime)
+  #data <- do.call("rbind", simResults@data)
+  
   vars <- names(data)[grepl("fit", names(data))]
   newNames <- vars
   newNames[vars == "yHat.fitEB"] <- "FH"
@@ -15,14 +17,14 @@ getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE", scenario = "
   newNames[vars == "yHat.fitSTEBLUP"] <- "STFH"
   
   dataList <- split(data, as.factor(data$Domain))
-    
+  
   evalList <- lapply(dataList, 
                      function(dat) {
                        evalData <- data.frame(Direct = critFunction(dat$trueY, dat$y))
                        evalData$nDirect <- simResults@n
                        #browser()
                        for (i in seq_along(vars)) {
-                         evalData[newNames[i]] <- critFunction(as.numeric(dat$trueY), as.numeric(dat[[vars[i]]]))
+                         evalData[newNames[i]] <- critFunction(dat$trueY, dat[[vars[i]]])
                          evalData[paste("n", newNames[i], sep = "")] <- sum(as.numeric(dat[[vars[i]]]) != 0)
                        }
                        evalData
@@ -46,7 +48,15 @@ calcAABIAS <- function(trueValues, estimates) {
 
 calcRBIAS <- function(trueValues, estimates) {
   estimates[estimates == 0] <- NA
-  mean(as.numeric((trueValues-estimates)/trueValues), na.rm=T)
+  trueValues[is.na(estimates)] <- NA
+  bias <- trueValues-estimates
+  mean(bias / trueValues, na.rm=T)
+}
+
+calcBIAS <- function(trueValues, estimates) {
+  estimates[estimates == 0] <- NA
+  bias <- trueValues-estimates
+  mean(bias, na.rm=T)
 }
 
 calcRRMSE <- function(trueValues, estimates) {
