@@ -51,12 +51,12 @@ simScenario <- function(sigma, sigmaCont, ...) {
 }
 
 output <- simScenario(n = 200, nDomains = 100, nTime = 10, beta = c(10, 1), sigma = 1, sigmaCont = 40,
-                      xdt = spGenerator, seVar = seSigmaClosure)[2]
+                      xdt = spGenerator, seVar = seSigmaClosure)[-2]
 require(SAE)
 
 simResults <- lapply(output, getSimResults, 
                      fitFunction = c("fitEB", "fitSTEBLUP", "fitSTREBLUP"),
                      mc.cores = 27)
 
-save(simResults, file = "Workspaces/simResults11.RData", compress = TRUE)
+save(simResults, file = "Workspaces/simResults12.RData", compress = TRUE)
 #load(file = "Workspaces/simResults1.RData")
