@@ -50,9 +50,8 @@ simScenario <- function(sigma, sigmaCont, ...) {
   
 }
 
-
-output <- simScenario(n = 200, nDomains = 100, nTime = 10, beta = c(10, 5), sigma = 1, sigmaCont = 50,
-                      xdt = spGenerator, seVar = seSigmaClosure)
+output <- simScenario(n = 200, nDomains = 100, nTime = 10, beta = c(10, 1), sigma = 1, sigmaCont = 40,
+                      xdt = spGenerator, seVar = seSigmaClosure)[2]
 require(SAE)
 
 simResults <- lapply(output, getSimResults, 
