@@ -4,9 +4,9 @@ rm(list= ls())
 #   require(devtools)
 #   if(!require(parallelTools)) install_github(repo="parallelTools", username = "wahani", subdir = "package")
 # }
-# require(devtools)
+require(devtools)
 # install_github(repo="parallelTools", username = "wahani", subdir = "package")
-# install_github(repo="spatioTemporalData", username = "wahani", subdir = "package")
+install_github(repo="spatioTemporalData", username = "wahani", subdir = "package")
 # 
 #install.packages("../spatioTemporalData/spatioTemporalData_1.1.1.tar.gz")
 #

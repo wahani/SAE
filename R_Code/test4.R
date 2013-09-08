@@ -1,9 +1,9 @@
 rm(list = ls())
 require(SAE)
 
-load("Workspaces//simResults9.RData")
+load("Workspaces//simResults10.RData")
 
-# # Für 6 und 7 8
+# # Für 6 und 7 
 # load("Workspaces//simResults6.RData")
 # simResultSTR <- simResults
 # load("Workspaces//simResults7.RData")
@@ -36,13 +36,14 @@ load("Workspaces//simResults9.RData")
 plot.simSetup <- function(simSetup, scenario = "") {
   require(ggplot2)
   
+  if (scenario == "") scenario <- simSetup@scenarioName
   datList <- lapply(c("calcRRMSE", "calcRBIAS"), getEvalCrit, simResults = simSetup, scenario = scenario)
   
   list("RRMSE" = ggplot(datList[[1]], aes(y = RRMSE, x = model)) + geom_boxplot() + coord_flip(),
        "RBIAS" = ggplot(datList[[2]], aes(y = RBIAS, x = model)) + geom_boxplot() + coord_flip())
 }
 
-plotSimResultList <- function(simResultsList, scenarioList = list("(v1, v2, 0, 0)", "(v1, v2, p1, p2)"), critFunctionName) {
+plotSimResultList <- function(simResultsList, scenarioList = as.list(rep("", length(simResultsList))), critFunctionName) {
   require(ggplot2)
   evalDataList <- mapply(getEvalCrit, simResultsList, scenarioList, critFunctionName = critFunctionName, SIMPLIFY = FALSE)
   evalData <- do.call("rbind", evalDataList)
@@ -68,6 +69,20 @@ plotSimResultList <- function(simResultsList, scenarioList = list("(v1, v2, 0, 0
     return(ggplot(evalData) + geom_boxplot(aes(x = model, y = BIAS)) +  
              coord_flip() + facet_grid(Scenario~.))
 }
+
+
+ggRBIAS <- plotSimResultList(simResults, critFunctionName = "calcRBIAS")
+ggRBIAS + coord_flip(ylim = c(-0, 0.2))
+
+simResults <- output
+simResults <- lapply(simResults, function(sr) {
+  datList <- sr@data
+  sr@data <- lapply(datList, function(dat) {
+    dat$fit.tmp <- 0
+    dat
+  })
+  sr
+})
 
 
 # simResults6.RData

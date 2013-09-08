@@ -6,6 +6,9 @@
 #' @export
 getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE", scenario = "") {
   require(reshape2)
+  
+  if(scenario == "") scenario <- simResults@scenarioName
+  
   critFunction <- match.fun(critFunctionName)
   data <- subset(do.call("rbind", simResults@data), Time == simResults@nTime)
   #data <- do.call("rbind", simResults@data)
