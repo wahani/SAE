@@ -12,7 +12,8 @@ Feature list
 * standard plots for bias-like and mse-like measures
 * optional log-scale for axis
 * optional reference-line
-* Filter for scenarios 
+* Filter for scenarios
+* Filter for data - parameters-Domains
 * maybe possibility to read-in multiple files
 * export for plots and tables
 * table of measures for specific area
@@ -21,3 +22,14 @@ Feature list
 
 Data Format
 ----------------------
+The app will expect a specific data format. Essentially you can read in a *.RData* file which will contain an object called *simData*. All other objects in that file will be ignored. *simData* is a named list containing two *data.frames*. They are called *parData*, for the results of the parameter estimates, and *evalData*, containing the predicted domain-level statistic.
+
+### *parData*
+r|parInd|parValue
+------|------|------
+
+
+r  | parInd | parValue
+------------- | ------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
