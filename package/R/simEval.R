@@ -44,7 +44,7 @@ getEvalCrit <- function(simResults, critFunctionName = "calcRRMSE", scenario = "
   result1
 }
 
-calcAABIAS <- function(trueValues, estimates) {
+calcABIAS <- function(trueValues, estimates) {
   estimates[estimates == 0] <- NA
   mean(abs(as.numeric(trueValues-estimates)), na.rm=T)
 }
@@ -53,7 +53,7 @@ calcRBIAS <- function(trueValues, estimates) {
   estimates[estimates == 0] <- NA
   trueValues[is.na(estimates)] <- NA
   bias <- trueValues-estimates
-  mean(bias / trueValues, na.rm=T)
+  median(bias / trueValues, na.rm=T)
 }
 
 calcBIAS <- function(trueValues, estimates) {
@@ -64,7 +64,7 @@ calcBIAS <- function(trueValues, estimates) {
 
 calcRRMSE <- function(trueValues, estimates) {
   estimates[estimates == 0] <- NA
-  sqrt(mean(as.numeric((trueValues-estimates)/trueValues)^2, na.rm = T))
+  sqrt(median(as.numeric((trueValues-estimates)/trueValues)^2, na.rm = T))
 }
 
 calcMSE <- function(trueValues, estimates) {
