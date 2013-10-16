@@ -22,14 +22,9 @@ Feature list
 
 Data Format
 ----------------------
-The app will expect a specific data format. Essentially you can read in a *.RData* file which will contain an object called *simData*. All other objects in that file will be ignored. *simData* is a named list containing two *data.frames*. They are called *parData*, for the results of the parameter estimates, and *evalData*, containing the predicted domain-level statistic.
+The app will expect a specific data format. Essentially you can read in a *.RData* file which will contain an object called *simData*. All other objects in that file will be ignored. *simData* is a named list containing two *data.frames*. They are called *parData*, for the results of the parameter estimates, and *estData*, containing the predicted domain-level statistic.
 
 ### *parData*
-r|parInd|parValue
-------|------|------
-
-
-r  | parInd | parValue
-------------- | ------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell
+```
+something
+```

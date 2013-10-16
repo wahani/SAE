@@ -24,18 +24,18 @@ shinyServer(function(input, output) {
   evalData <- reactive({
     
     # Daten aufrufen:
-    simData <- getData()
+    estData <- getData()$estData
     
-    # Filtern auf Domain
-    # ...
+    # Berechnung der Gütemaße - BIAS, RBIAS, etc.
+    
+    aggregate(as.matrix(estData[,grepl("est", names(estData))]) ~ domain, data = estData, FUN = mean)
     
     # Filtern auf Gütemaße zum Anzeigen - Spalten
     # ...
     
     # Temp
-    simData <- data.frame(x = 1:10, y = rnorm(10))
-    
-    return(simData)
+        
+    return(summary(estData))
       
   })
   
@@ -55,20 +55,6 @@ shinyServer(function(input, output) {
     
   })
     
-  somePlotReactive <- reactive({
-    x <- 0
-    if(input$checkSlider==FALSE){
-      x<-input$minute2 
-      print(input$minute2 )
-    }
-    
-    if(input$checkSlider==TRUE){
-      x<-input$minute1  
-      print(input$minute1 )
-    }
-    x
-  })
-
   logY <- reactive( input$logY )
   grid <- reactive( input$grid)
   referenceLine <- reactive( input$betfair )
@@ -78,7 +64,7 @@ shinyServer(function(input, output) {
   somePlotFunction <- function(){
     
     # Zugriff auf die Reactives
-    dat <- evalData()
+    dat <- parameterData()
     
     isLog <- if(logY()) "y" else ""
     isGrid <- grid()
