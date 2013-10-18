@@ -19,6 +19,7 @@ Feature list
 * table of measures for specific area
 * table of results
 * plots and tables for parameter estimation - density/boxplot/table
+* plots concordance analysis
 
 Data Format
 ----------------------

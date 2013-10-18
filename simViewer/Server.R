@@ -35,7 +35,7 @@ shinyServer(function(input, output) {
     
     # Temp
         
-    return(summary(estData))
+    return(estData)
       
   })
   
@@ -80,13 +80,20 @@ shinyServer(function(input, output) {
   output$somePlot <- renderPlot({ print(somePlotFunction()) })  
   
   # Output Tables
-  output$evalData  <- renderTable({
-    evalData()                               
-  }, booktabs = TRUE, include.rownames = FALSE)
+  output$evalSummary  <- renderPrint({
+    dat <- evalData()
+    dat <- dat[grepl("est.", names(dat))]
+    summary(dat)
+  })
   
   # Output Tables
   output$parameterData  <- renderTable({
     parameterData()                               
   }, booktabs = TRUE, include.rownames = FALSE)
   
+  output$varSelect <- renderUI({
+    dat <- evalData()
+    checkboxGroupInput(inputId = "varSelect", label = "Select variables",
+                names(dat))
+  })
 })

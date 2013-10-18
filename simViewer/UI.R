@@ -45,9 +45,10 @@ shinyUI(
 #     conditionalPanel(condition = "input.checkSlider != true",
 #                      numericInput(inputId = "minute2", label="", value=0 , min=0, max=90)
 #                      ),        
-#     br(),
-     checkboxInput(inputId = "logY", label = "Logarithmic scale", value = FALSE),
-     checkboxInput(inputId = "grid", label = "Grid", value = FALSE)
+    #     br(),
+    checkboxInput(inputId = "logY", label = "Logarithmic scale", value = FALSE),
+    checkboxInput(inputId = "grid", label = "Grid", value = FALSE),
+    uiOutput("varSelect")
     
   )
   #   )
@@ -69,7 +70,7 @@ shinyUI(
       tabPanel(title= "Tab: Estimated Parameters",
                tableOutput("parameterData")),
       tabPanel(title= "Tab: Eval Data",
-               tableOutput("evalData"))
+               verbatimTextOutput("evalSummary"))
     )
   )
   )
