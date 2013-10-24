@@ -7,11 +7,11 @@ Feature list
 -----------------------
 ### ready:
 * load data button
+* standard plots for bias-like and mse-like measures
+* optional reference-line
 
 ### wanted:
-* standard plots for bias-like and mse-like measures
 * optional log-scale for axis
-* optional reference-line
 * Filter for scenarios
 * Filter for data - parameters-Domains
 * maybe possibility to read-in multiple files
