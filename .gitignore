@@ -11,3 +11,8 @@ libWin/*
 
 #Workspaces/*
 #*.Rd
+
+#src
+*.o
+*.dll
+*.so
