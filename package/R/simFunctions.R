@@ -1,3 +1,17 @@
+simScenario <- function(sigma, sigmaCont, ...) {
+  require(spatioTemporalData)
+  set.seed(1)
+  
+  svvpp <- simRunContamination(sarCorr=0.5, arCorr=0.5, 
+                               spatialCont = list(sigma = sigma, sigmaCont = sigmaCont, nDomainsCont = 3),
+                               temporalCont = list(sigma = sigma, sigmaCont = sigmaCont, nDomainsCont = 2),
+                               spatioTemporalMessup = TRUE, scenarioName = "(v1, v2, 0.5, 0.5)",
+                               ...)
+  
+  output <- c(svvpp, recursive=TRUE)
+  
+}
+
 # Functions for simulation
 fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
   # function definition
