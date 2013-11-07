@@ -1,5 +1,5 @@
 rm(list= ls())
-
+library(SAE)
 # Daten generieren:
 
 # Installiere Paket
