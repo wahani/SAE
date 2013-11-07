@@ -30,7 +30,7 @@ prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSa
                      K = 0.71,
                      method = method,
                      maxIter = maxIter,
-                     consoleOutput = TRUE,
+                     consoleOutput = FALSE,
                      
                      # "Empty" Vector of Random Effects Estimates
                      u = numeric(nDomains * nTime))

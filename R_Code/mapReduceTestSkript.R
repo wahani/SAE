@@ -82,10 +82,12 @@ slot(simSetup, "data") <- lapply(simSetup@data,
          dat
        })
 
+simResults <- fitSimMapReduce(fitSTREBLUP, simSetup, ind = 1)
 
-system.time(simResults <- fitSimMapReduce(fitSTREBLUP, simSetup, ind = 1))
+for (i in 1:nrow(simResults)) {
+  cat(paste(simResults[i, ], collapse = ";"), "\n")
+}
 
-simResults
 
 
 
