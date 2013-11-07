@@ -70,7 +70,7 @@ fitSimMapReduce <- function(fitFunction, simSetup, ind) {
 
 ################################################################################
 
-simSetup <- simScenario(n = 4, nDomains = 50, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 40,
+simSetup <- simScenario(n = 4, nDomains = 30, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 40,
                       xdt = spGenerator, seVar = seSigmaClosure)[[1]]
 
 counter <- counterClosure()
@@ -82,11 +82,15 @@ slot(simSetup, "data") <- lapply(simSetup@data,
          dat
        })
 
-simResults <- fitSimMapReduce(fitSTREBLUP, simSetup, ind = 1)
+con <- file("stdin", open = "r")
+while (length(line <- readLines(con, n = 1, warn = FALSE)) > 0) {
+  simResults <- fitSimMapReduce(fitSTREBLUP, simSetup, ind = as.numeric(line))
 
-for (i in 1:nrow(simResults)) {
-  cat(paste(simResults[i, ], collapse = ";"), "\n")
+  for (i in 1:nrow(simResults)) {
+    cat(paste(simResults[i, ], collapse = ";"), "\n")
+  }
 }
+
 
 
 
