@@ -1,5 +1,7 @@
+#! /usr/bin/env Rscript
+
 rm(list= ls())
-library(SAE)
+library(SAE, quietly=FALSE)
 # Daten generieren:
 
 # Installiere Paket

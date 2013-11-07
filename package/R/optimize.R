@@ -240,7 +240,7 @@ estimateRE <- function(modelSpecs) {
   maxit <- modelSpecs$maxIter
   while (abs(diff.u)>tol)
   {
-    consoleOutput(TRUE)
+    consoleOutput(FALSE)
     iter2<-iter2+1 
     v_robust=as.vector(vv.tmp)
     res1<-sqrt.R.tmp.inv%*%(y-XS%*%beta.q-z%*%v_robust)
