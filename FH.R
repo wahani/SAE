@@ -92,7 +92,7 @@ e <- rnorm(D,0,sqrt(vd))
 
 
 DirEst <- 5 + Xmean %*%beta + u + e
-
+require(sae)
 TIME[r,"Molina"] <- system.time(resSAE    <- sae::eblupFH(DirEst ~ Xmean, vd))[3]
 TIME[r,"Rcpp"]     <- system.time(resRcpp <- FayHeriott(ybar=DirEst,Xmean=cbind(1,Xmean),Dvec=vd))[3]
 }

@@ -21,7 +21,7 @@ updateP <- function(solvedV, X) {
   solvedV - solvedV %*% X %*% tmp1 %*% crossprod(X, solvedV)
 }
 
-#' updateP
+#' updateV
 #' 
 #' @description Marhuenda et. al. (2013): page 311 Remark 1
 #'
