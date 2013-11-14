@@ -92,9 +92,4 @@ while (length(line <- readLines(con, n = 1, warn = FALSE)) > 0) {
     cat(paste(simResults[i, ], collapse = ";"), "\n")
   }
 }
-
-
-
-
-
-
+close(con)
