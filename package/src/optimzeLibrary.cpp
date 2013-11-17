@@ -57,7 +57,8 @@ arma::mat matV(arma::mat W, double rho1, double sigma1, double rho2, double sigm
 // [[Rcpp::export]]
 Rcpp::List matVinv(arma::mat W, double rho1, double sigma1, double rho2, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError) {
   arma::mat V = matV(W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError);
-  arma::mat Vinv = inv(trimatu(chol(V)));
+  arma::mat Vtmp = inv(trimatu(chol(V)));
+  arma::mat Vinv = Vtmp * Vtmp.t();
   return Rcpp::List::create(Rcpp::Named("V", V),
   Rcpp::Named("Vinv", Vinv));
 }
@@ -77,7 +78,8 @@ arma::colvec blue(arma::colvec y, arma::mat X, arma::mat Vinv) {
 // [[Rcpp::export]]
 double llr(arma::colvec y, arma::mat X, double rho1, double sigma1, double rho2, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W) {
   arma::mat V = matV(W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError);
-  arma::mat Vinv = inv(trimatu(chol(V)));
+  arma::mat Vtmp = inv(trimatu(chol(V)));
+  arma::mat Vinv = Vtmp * Vtmp.t();
   arma::colvec beta = blue(y, X, Vinv);
   
   arma::mat resid = y - X * beta;
@@ -92,6 +94,6 @@ double llr(arma::colvec y, arma::mat X, double rho1, double sigma1, double rho2,
   
   double llp = -0.5 * (val + tmp(0,0)); 
   double llr = llp - 0.5 * val1;
-  return llp;
+  return llr;
 }
 

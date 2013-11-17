@@ -42,3 +42,15 @@ arma::mat cppArmFuncChol(arma::mat X) {
       
    return xRet;
 }
+
+// [[Rcpp::export]]
+arma::mat cppChol(arma::mat X) {
+   return chol(X);
+}
+
+// [[Rcpp::export]]
+arma::mat cppChol2Inv(arma::mat X) {
+   return inv(trimatu(X));
+}
+
+

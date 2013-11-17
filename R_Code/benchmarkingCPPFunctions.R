@@ -1,5 +1,5 @@
-# library(SAE)
-# library(microbenchmark)
+library(SAE)
+library(microbenchmark)
 # rho1 <- 0.5
 # rho2 <- 0.5
 # sigma1 <- 2
@@ -55,9 +55,6 @@
 #     list(rho1 = 0.1, rho2 = 0.1, sigma1 = 1, sigma2 = 1))
 # 
 
-
-
-
 rm(list= ls())
 
 # Daten generieren:
@@ -110,8 +107,15 @@ simScenario <- function(sigma, sigmaCont, ...) {
   
 }
 
-output <- simScenario(n = 4, nDomains = 60, nTime = 15, beta = c(100, 1), sigma = 1, sigmaCont = 40,
+output <- simScenario(n = 4, nDomains = 100, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 40,
                       xdt = spGenerator, seVar = seSigmaClosure)[-2]
+
+
+
+# simResults <- lapply(output, getSimResults, 
+#                      fitFunction = c("fitSTREBLUP"),
+#                      mc.cores = 1)
+
 
 simSetup <- output[[1]]
 dat <- simSetup@data[[1]]
@@ -121,17 +125,38 @@ sigmaSamplingError <- simSetup@sigmaSE
 W <- wMatrix(nDomains=simSetup@nDomains)
 Z1 <- reZ1(nDomains=simSetup@nDomains, nTime=simSetup@nTime)
 
+
+system.time(
+tmp1 <- fitSTREBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
+)
+
 minusloglClosure <- function(y, X, sigmaSamplingError, W, Z1) {
-  function(rho1, sigma1, rho2, sigma2) llr(y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W)
+  function(rho1, sigma1, rho2, sigma2) -llr(y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W)
 }
 
-mle(minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
-    list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), lower = c(-0.9, 0.1, -0.9, 0.1), method = "L-BFGS-B",
-    upper = c(1, 10, 1, 10))
+library(stats4)
+system.time(
+  tmp2 <- mle(minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
+                list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), lower = c(-0.99, 0.01, -0.99, 0.01), method = "SANN",
+                upper = c(0.99, 100000, 0.99, 10000))
+)
+
+system.time(
+tmp3 <- mle(
+  minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
+    list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), method = "SANN")
+)
+
+summary(tmp3)
+
+system.time(
+  tmp4 <- fitSTEBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
+)
 
 
 
-Vinv <- matVinv(W, 0.5, 1, 0.5, 1, Z1, sigmaSamplingError)
+
+Vinv <- matVinv(W, rho1 = 0.5, sigma1 = 1, rho2 = 0.5, sigma2 = 1, Z1, sigmaSamplingError)
 
 
 ome2 <- updateOmega2(0.5, 10)
@@ -140,8 +165,17 @@ ome1 <- reSAR1(W=W, rho=0.5)
 A <- updateA(sigma2=1, Ome2=ome2, nDomains=simSetup@nDomains, nTime = simSetup@nTime, sigmaSamplingError=sigmaSamplingError)
 V <- updateV(1, ome1, A, Z1)
 
+tmp1 <- cppChol(V)
+tmp2 <- chol(V)
+
+all.equal(chol2inv(tmp1), tcrossprod(cppChol2Inv(tmp1)) )
+
+
+all.equal(tmp1, tmp2)
 
 all.equal(Vinv$V, V)
+
+all.equal(Vinv$Vinv, solve(V))
 
 blue(y, X, Vinv$Vinv)
 
