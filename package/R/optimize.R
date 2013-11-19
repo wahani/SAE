@@ -239,14 +239,23 @@ estimateRE <- function(modelSpecs) {
   sqrt.G.tmp.inv=solve(t(svd.G.tmp$v%*%(t(svd.G.tmp$u)*sqrt(svd.G.tmp$d))))
   
   # Variance-Covariance
-  z <- modelSpecs$Z
-  V <- z%*%G.tmp%*%t(z) + R.tmp
+   z <- modelSpecs$Z
+#   V <- z%*%G.tmp%*%t(z) + R.tmp
+#   
+#   A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=ome2Tmp, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
+#                modelSpecs$sigmaSamplingError)
+#   #V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
+#   Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
+#                         arCorr=modelSpecs$rho[2], A=A, Ome1=ome1, Z1=modelSpecs$Z1)
   
-  A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=ome2Tmp, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
-               modelSpecs$sigmaSamplingError)
-  #V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-  Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
-                        arCorr=modelSpecs$rho[2], A=A, Ome1=ome1, Z1=modelSpecs$Z1)
+  listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
+                   rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
+                   modelSpecs$sigmaSamplingError)
+  
+  V <- listV$V
+  Vinv <- listV$Vinv
+  
+  
   
   sqrt.u <- updateSqrtU(V=V)
   sqrt.u.inv <- diag(1/diag(sqrt.u))

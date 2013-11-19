@@ -126,58 +126,79 @@ W <- wMatrix(nDomains=simSetup@nDomains)
 Z1 <- reZ1(nDomains=simSetup@nDomains, nTime=simSetup@nTime)
 
 
-system.time(
+# system.time(
+# tmp1 <- fitSTREBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
+# )
+# 
+# minusloglClosure <- function(y, X, sigmaSamplingError, W, Z1) {
+#   function(rho1, sigma1, rho2, sigma2) -llr(y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W)
+# }
+# 
+# library(stats4)
+# system.time(
+#   tmp2 <- mle(minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
+#                 list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), lower = c(-0.99, 0.01, -0.99, 0.01), method = "SANN",
+#                 upper = c(0.99, 100000, 0.99, 10000))
+# )
+# 
+# system.time(
+# tmp3 <- mle(
+#   minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
+#     list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), method = "SANN")
+# )
+# 
+# summary(tmp3)
+# 
+# system.time(
+#   tmp4 <- fitSTEBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
+# )
+
+
+
+
+# Vinv <- matVinv(W, rho1 = 0.5, sigma1 = 1, rho2 = 0.5, sigma2 = 1, Z1, sigmaSamplingError)
+# 
+# 
+# ome2 <- updateOmega2(0.5, 10)
+# ome1 <- reSAR1(W=W, rho=0.5)
+# 
+# A <- updateA(sigma2=1, Ome2=ome2, nDomains=simSetup@nDomains, nTime = simSetup@nTime, sigmaSamplingError=sigmaSamplingError)
+# V <- updateV(1, ome1, A, Z1)
+# 
+# tmp1 <- cppChol(V)
+# tmp2 <- chol(V)
+# 
+# all.equal(chol2inv(tmp1), tcrossprod(cppChol2Inv(tmp1)) )
+# 
+# 
+# all.equal(tmp1, tmp2)
+# 
+# all.equal(Vinv$V, V)
+# 
+# all.equal(Vinv$Vinv, solve(V))
+# 
+# blue(y, X, Vinv$Vinv)
+
+
+
+
+Rprof(tmp <- tempfile())
 tmp1 <- fitSTREBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
-)
+Rprof()
+profileSummary <- summaryRprof(tmp)
+unlink(tmp)
 
-minusloglClosure <- function(y, X, sigmaSamplingError, W, Z1) {
-  function(rho1, sigma1, rho2, sigma2) -llr(y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W)
-}
 
-library(stats4)
-system.time(
-  tmp2 <- mle(minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
-                list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), lower = c(-0.99, 0.01, -0.99, 0.01), method = "SANN",
-                upper = c(0.99, 100000, 0.99, 10000))
-)
+profileSummary$by.total
 
-system.time(
-tmp3 <- mle(
-  minusloglClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1), 
-    list(rho1 = 0.5, rho2 = 0.5, sigma1 = 1, sigma2 = 1), method = "SANN")
-)
+[c("\"comp.live.quote\"", "\"set.output\"" , "\"bimatrix3\"", "\"tripois\"", "\"get.data\"", "\"write.data\"",
+                          "\"transform.data\"", "\"delete.database.entries\"", "\"write.in.log\""), ]
 
-summary(tmp3)
-
-system.time(
-  tmp4 <- fitSTEBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
-)
+profileSummary$by.total
 
 
 
 
-Vinv <- matVinv(W, rho1 = 0.5, sigma1 = 1, rho2 = 0.5, sigma2 = 1, Z1, sigmaSamplingError)
-
-
-ome2 <- updateOmega2(0.5, 10)
-ome1 <- reSAR1(W=W, rho=0.5)
-
-A <- updateA(sigma2=1, Ome2=ome2, nDomains=simSetup@nDomains, nTime = simSetup@nTime, sigmaSamplingError=sigmaSamplingError)
-V <- updateV(1, ome1, A, Z1)
-
-tmp1 <- cppChol(V)
-tmp2 <- chol(V)
-
-all.equal(chol2inv(tmp1), tcrossprod(cppChol2Inv(tmp1)) )
-
-
-all.equal(tmp1, tmp2)
-
-all.equal(Vinv$V, V)
-
-all.equal(Vinv$Vinv, solve(V))
-
-blue(y, X, Vinv$Vinv)
 
 
 
