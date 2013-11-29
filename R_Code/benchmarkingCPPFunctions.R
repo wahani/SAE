@@ -106,11 +106,11 @@ simScenario <- function(sigma, sigmaCont, ...) {
                                spatioTemporalMessup = FALSE, scenarioName = "(0, 0, 0.5, 0.5)", 
                                ...)
   
-  output <- c(s00pp, recursive=TRUE)
+  output <- c(svvpp, recursive=TRUE)
   
 }
 
-output <- simScenario(n = 4, nDomains = 100, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 40,
+output <- simScenario(n = 4, nDomains = 100, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 100,
                       xdt = spGenerator, seVar = seSigmaClosure)[-2]
 
 
@@ -169,21 +169,26 @@ tmp1$sigma
 
 lltClosure <- function(y, X, sigmaSamplingError, W, Z1) {
   function(theta) {
-    V <- matV(W=W, rho1=rev(theta)[4], sigma1 = rev(theta)[3], rho2=rev(theta)[2],
-              sigma2 = rev(theta)[1], Z1, sigmaSamplingError)
-    mPred <- as.numeric(X %*% rev(rev(theta)[-(1:4)]))
+    df <- 2
+    lV <- matVinv(W=W, rho1=rev(theta)[4], sigma1 = rev(theta)[3], rho2=rev(theta)[2],
+                     sigma2 = rev(theta)[1], Z1, sigmaSamplingError)
+    beta <- blue(y=y, X=X, Vinv=lV$Vinv)
+    mPred <- as.numeric(X %*% beta)
+    pt <- -0.5 * log(1 + df + 4) *  determinant(crossprod(X, lV$Vinv) %*% X)$modulus
     -sum(dmt(as.numeric(y), mean = mPred, 
-                           S = V, df = Inf, log = TRUE))
+                           S = lV$V, df = df, log = TRUE)) + pt
   }
 }
 
 system.time(
-  tmp <- nloptr(c(100, 1, 0.5, 1, 0.5, 1), 
+  tmp <- nloptr(c(0.5, 1, 0.5, 1), 
                 lltClosure(y = y, X = X, sigmaSamplingError = sigmaSamplingError, W = W, Z1),
-                lb = c(0, -10, -0.99, 0.01, -0.99, 0.01), ub = c(200, 10, 0.99, 10000, 0.99, 10000),
+                lb = c(-0.99, 0.01, -0.99, 0.01), ub = c(0.99, 10000, 0.99, 10000),
                 opts = list(algorithm = "NLOPT_LN_NELDERMEAD",
                             xtol_rel = 10^(-3),
                             maxeval = 500)))
+
+
 
 # 
 # system.time(
