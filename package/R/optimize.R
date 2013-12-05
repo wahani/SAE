@@ -88,36 +88,38 @@ optimizeSigma <- function(modelSpecs) {
                           derVSigma2 = matVderS2(Ome2=Ome2, nDomains=modelSpecs$nDomains))
       
       ZVuZt <- V - diag(modelSpecs$sigmaSamplingError)
+      ZVuZtinv <- chol2inv(chol(ZVuZt))
+      
       Ome1Bar <- Ome2Bar <- matrix(0, nrow = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains,
                                    ncol = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)
       
       Ome1Bar[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- Ome1
       Ome2Bar[(modelSpecs$nDomains + 1):NROW(Ome2Bar), (modelSpecs$nDomains + 1):NROW(Ome2Bar)] <- Ome2
       
-      
-      microbenchmark(
-      a <- c(tmp1 %*% tcrossprod(derivatives$derVSigma1, tmp1),
-             tmp1 %*% tcrossprod(derivatives$derVSigma2, tmp1)),
-      
-      
-      A11
-      A12
-      A21
-      A22
-      
-      
       tmp1 <- crossprod(phiR, sqrtU) %*% Vinv
-                  
       
-      tmpSig1 <- sum(diag(modelSpecs$K * Vinv %*% derivatives$derVSigma1))
-      tmpSig2 <- sum(diag(modelSpecs$K * Vinv %*% derivatives$derVSigma2))
+      a <- c(tmp1 %*% tcrossprod(derivatives$derVSigma1, tmp1),
+             tmp1 %*% tcrossprod(derivatives$derVSigma2, tmp1))
       
-      optSig1 <- tmp1 %*% derivatives$derVSigma1 %*% tmp2 - tmpSig1
-      optSig2 <- tmp1 %*% derivatives$derVSigma2 %*% tmp2 - tmpSig2
+      tmp2 <- modelSpecs$K * Vinv %*% derivatives$derVSigma1 %*% ZVuZtinv
+      tmp3 <- modelSpecs$K * Vinv %*% derivatives$derVSigma2 %*% ZVuZtinv
       
-      return(optSig1^2 + optSig2^2)
+      tmp4 <- modelSpecs$Z %*% tcrossprod(Ome1Bar, modelSpecs$Z)
+      tmp5 <- modelSpecs$Z %*% tcrossprod(Ome2Bar, modelSpecs$Z)
+      
+      matTrace <- function(x) sum(diag(x))
+      A <- diag(nrow = 2)
+      A[1,1] <- matTrace(tmp2 %*% tmp4)
+      A[1,2] <- matTrace(tmp2 %*% tmp5)
+      A[2,1] <- matTrace(tmp3 %*% tmp4)
+      A[2,2] <- matTrace(tmp3 %*% tmp5)
+      
+      return(solve(A) %*% a)
     }
   }
+  browser()
+  
+  summary(fp(optimizerClosure(modelSpecs), modelSpecs$sigma))
   
   modelSpecs$sigma <- optim(par=modelSpecs$sigma, 
                             fn = optimizerClosure(modelSpecs),
