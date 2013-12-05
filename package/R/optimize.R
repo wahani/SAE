@@ -71,17 +71,10 @@ optimizeSigma <- function(modelSpecs) {
       
       Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
       Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-      
-#       A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
-#                    modelSpecs$sigmaSamplingError)
-#       V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-#       #Vinv <- qr.solve(V)
-#       Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
-#                             arCorr=modelSpecs$rho[2], A=A, Ome1=Ome1, Z1=modelSpecs$Z1)
+
       listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
                        rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
                        modelSpecs$sigmaSamplingError)
-      
       V <- listV$V
       Vinv <- listV$Vinv
       
@@ -91,15 +84,30 @@ optimizeSigma <- function(modelSpecs) {
       resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
       phiR <- modelSpecs$psiFunction(u = resid)
       
-      derivatives <- updateDerivatives(sarCorr=modelSpecs$rho[1], 
-                                       sigma1 = modelSpecs$sigma[1],
-                                       arCorr = modelSpecs$rho[2],
-                                       sigma2 = modelSpecs$sigma[2],
-                                       Ome1 = Ome1,
-                                       Ome2 = Ome2,
-                                       parSet = "sigma")
+      derivatives <- list(derVSigma1 = matVderS1(Ome1=Ome1, Z1 = modelSpecs$Z1),
+                          derVSigma2 = matVderS2(Ome2=Ome2, nDomains=modelSpecs$nDomains))
+      
+      ZVuZt <- V - diag(modelSpecs$sigmaSamplingError)
+      Ome1Bar <- Ome2Bar <- matrix(0, nrow = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains,
+                                   ncol = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)
+      
+      Ome1Bar[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- Ome1
+      Ome2Bar[(modelSpecs$nDomains + 1):NROW(Ome2Bar), (modelSpecs$nDomains + 1):NROW(Ome2Bar)] <- Ome2
+      
+      
+      microbenchmark(
+      a <- c(tmp1 %*% tcrossprod(derivatives$derVSigma1, tmp1),
+             tmp1 %*% tcrossprod(derivatives$derVSigma2, tmp1)),
+      
+      
+      A11
+      A12
+      A21
+      A22
+      
+      
       tmp1 <- crossprod(phiR, sqrtU) %*% Vinv
-      tmp2 <- Vinv %*% sqrtU %*% phiR
+                  
       
       tmpSig1 <- sum(diag(modelSpecs$K * Vinv %*% derivatives$derVSigma1))
       tmpSig2 <- sum(diag(modelSpecs$K * Vinv %*% derivatives$derVSigma2))
