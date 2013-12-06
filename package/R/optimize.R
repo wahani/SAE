@@ -125,7 +125,6 @@ optimizeSigma <- function(modelSpecs) {
                          opts = list(tol = modelSpecs$tol, 
                                      maxiter = modelSpecs$maxIter))$x
 
-
   return(modelSpecs)
 }
 
@@ -166,14 +165,11 @@ optimizeRho <- function(modelSpecs) {
       resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
       phiR <- modelSpecs$psiFunction(u = resid)
       
-      derivatives <- updateDerivatives(sarCorr=modelSpecs$rho[1], 
-                                       sigma1 = modelSpecs$sigma[1],
-                                       arCorr = modelSpecs$rho[2],
-                                       sigma2 = modelSpecs$sigma[2],
-                                       Ome1 = Ome1,
-                                       Ome2 = Ome2,
-                                       parSet = "rho")
-      
+      derivatives <- list(derVSarCorr = matVderR1(rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
+                                                  Z1=modelSpecs$Z1, Ome1=Ome1, W=modelSpecs$w),
+                          derVArCorr = matVderR2(rho2=modelSpecs$rho[2], sigma2=modelSpecs$sigma[2], 
+                                                 Ome2=Ome2, nDomains=modelSpecs$nDomains))
+            
       tmp1 <- crossprod(phiR, sqrtU) %*% Vinv
       tmp2 <- Vinv %*% sqrtU %*% phiR
       
@@ -215,8 +211,9 @@ optimizeParameters <- function(modelSpecs) {
     oldParams <- c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho)
     consoleOutput(modelSpecs$consoleOutput)
     modelSpecs <- optimizeBeta(modelSpecs)
+    modelSpecs <- optimizeSigma(modelSpecs)
     modelSpecs <- optimizeRho(modelSpecs)
-    modelSpecs <- optimizeSigma(modelSpecs)  
+      
     iter <- iter + 1
   }
   return(modelSpecs)
