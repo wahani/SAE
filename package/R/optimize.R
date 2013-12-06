@@ -87,15 +87,17 @@ optimizeSigma <- function(modelSpecs) {
       derivatives <- list(derVSigma1 = matVderS1(Ome1=Ome1, Z1 = modelSpecs$Z1),
                           derVSigma2 = matVderS2(Ome2=Ome2, nDomains=modelSpecs$nDomains))
       
-      ZVuZt <- V - diag(modelSpecs$sigmaSamplingError)
+      ZVuZt <- V 
+      diag(ZVuZt) <- diag(ZVuZt) - modelSpecs$sigmaSamplingError
+      
       ZVuZtinv <- chol2inv(chol(ZVuZt))
       
       Ome1Bar <- Ome2Bar <- matrix(0, nrow = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains,
                                    ncol = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)
       
       Ome1Bar[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- Ome1
-      Ome2Bar[(modelSpecs$nDomains + 1):NROW(Ome2Bar), (modelSpecs$nDomains + 1):NROW(Ome2Bar)] <- Ome2
-      
+      Ome2Bar[(modelSpecs$nDomains + 1):NROW(Ome2Bar), (modelSpecs$nDomains + 1):NROW(Ome2Bar)] <- omega2Diag(Ome2, modelSpecs$nDomains)
+            
       tmp1 <- crossprod(phiR, sqrtU) %*% Vinv
       
       a <- c(tmp1 %*% tcrossprod(derivatives$derVSigma1, tmp1),
@@ -117,13 +119,13 @@ optimizeSigma <- function(modelSpecs) {
       return(solve(A) %*% a)
     }
   }
-  browser()
   
-  summary(fp(optimizerClosure(modelSpecs), modelSpecs$sigma))
-  
-  modelSpecs$sigma <- optim(par=modelSpecs$sigma, 
-                            fn = optimizerClosure(modelSpecs),
-                            method = modelSpecs$method)$par
+  modelSpecs$sigma <- fp(optimizerClosure(modelSpecs), 
+                         modelSpecs$sigma, 
+                         opts = list(tol = modelSpecs$tol, 
+                                     maxiter = modelSpecs$maxIter))$x
+
+
   return(modelSpecs)
 }
 

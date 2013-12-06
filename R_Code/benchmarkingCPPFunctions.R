@@ -110,7 +110,7 @@ simScenario <- function(sigma, sigmaCont, ...) {
   
 }
 
-output <- simScenario(n = 4, nDomains = 100, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 100,
+output <- simScenario(n = 4, nDomains = 100, nTime = 10, beta = c(100, 1), sigma = 1, sigmaCont = 40,
                       xdt = spGenerator, seVar = seSigmaClosure)[-2]
 
 
@@ -130,7 +130,7 @@ Z1 <- reZ1(nDomains=simSetup@nDomains, nTime=simSetup@nTime)
 
 
 system.time(
-tmp1 <- fitSTEBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
+tmp1 <- fitSTREBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
 )
 tmp1$beta
 tmp1$rho
@@ -301,10 +301,6 @@ unlink(tmp)
 
 profileSummary$by.total
 
-[c("\"comp.live.quote\"", "\"set.output\"" , "\"bimatrix3\"", "\"tripois\"", "\"get.data\"", "\"write.data\"",
-                          "\"transform.data\"", "\"delete.database.entries\"", "\"write.in.log\""), ]
-
-profileSummary$by.total
 
 
 
