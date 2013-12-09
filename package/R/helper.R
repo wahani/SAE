@@ -1,3 +1,4 @@
+matTrace <- function(x) sum(diag(x))
 
 combineSimResults <- function(simResults, functionNames) {
   simSetup <- Reduce("+", x=simResults)
