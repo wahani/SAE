@@ -5,15 +5,6 @@
 #' @param modelSpecs list with all necessary components for estimation
 optimizeBeta <- function(modelSpecs) {
   #update necessary components
-#   Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
-#   Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-#   A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=Ome2, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
-#                modelSpecs$sigmaSamplingError)
-#   V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-#   Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
-#                         arCorr=modelSpecs$rho[2], A=A, Ome1=Ome1, Z1=modelSpecs$Z1)
-#   browser()
-  
   
   listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
                    rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
@@ -175,11 +166,15 @@ optimizeRho <- function(modelSpecs) {
   }
   
   modelSpecs$rho <- nloptr(modelSpecs$rho, 
-                          optimizerClosure(modelSpecs),
+                           optimizerRho,
                           lb = c(-0.99, -0.99), ub = c(0.99, 0.99),
                           opts = list(algorithm = "NLOPT_LN_NELDERMEAD",
                                       xtol_rel = modelSpecs$tol,
-                                      maxeval = modelSpecs$maxIter))$solution
+                                      maxeval = modelSpecs$maxIter),
+                           y = modelSpecs$y, X = modelSpecs$x, sigma1 = modelSpecs$sigma[1], 
+                           sigma2 = modelSpecs$sigma[2], Z1 = modelSpecs$Z1, 
+                           sigmaSamplingError = modelSpecs$sigmaSamplingError, 
+                           W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K)$solution
   return(modelSpecs)
 }
 

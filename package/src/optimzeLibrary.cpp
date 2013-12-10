@@ -171,3 +171,68 @@ Rcpp::List llr(arma::colvec y, arma::mat X, double rho1, double sigma1, double r
   Rcpp::Named("gradient", gradient));
 }
 
+
+arma::colvec psiOne(arma::colvec u, double k = 1.345){
+  //arma::colvec weights = rep(1, length(u));
+  //sm<-median(abs(u/sqrt(var.weights)))/0.6745
+  double sm = median(abs(u)) / 0.6745;
+  Rcpp::NumericVector tmp = as<NumericVector>(wrap(k/abs(u/sm)));
+  arma::colvec w = Rcpp::pmin(1.0, tmp);
+  return w%u;
+}
+
+// [[Rcpp::export]]
+double optimizerRho(arma::colvec rho, arma::colvec y, arma::mat X, double sigma1, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K) {
+  
+  // Variance-Covarianze matrix
+  Rcpp::List Vlist = matVinv(W, rho(0), sigma1, rho(1), sigma2, Z1, sigmaSamplingError);
+  arma::mat V = Vlist(0);
+  arma::mat Vinv = Vlist(1);
+  
+  // sqrt of U + inverse
+  arma::mat sqrtU(V.n_rows, V.n_rows);
+  sqrtU.fill(0.0);
+  sqrtU.diag() = sqrt(V.diag());
+  
+  arma::mat sqrtUinv(V.n_rows, V.n_rows);
+  sqrtUinv.fill(0.0);
+  sqrtUinv.diag() = 1/sqrtU.diag();
+  
+  // residuals and huber
+  arma::colvec resid = sqrtUinv * (y - X * beta);
+  arma::colvec phiR = psiOne(resid);
+  
+  arma::mat Ome1 = reSAR1(W, rho(0));
+  arma::mat Ome2 = reAR1(Z1.n_rows / W.n_rows, rho(1));
+  arma::mat derVSarCorr = matVderR1(rho(0), sigma1, Z1, Ome1, W);
+  arma::mat derVArCorr = matVderR2(rho(1), sigma2, Ome2, W.n_rows);
+  
+  arma::mat tmp1 = phiR.t() * sqrtU * Vinv;
+        
+  double tmp2 = trace(K * Vinv * derVSarCorr);
+  double tmp3 = trace(K * Vinv * derVArCorr);
+  
+  arma::mat tmp4 = tmp1 * derVSarCorr * tmp1.t();
+  arma::mat tmp5 = tmp1 * derVArCorr * tmp1.t();
+  
+  double optRho1 = tmp4(0, 0) - tmp2;
+  double optRho2 = tmp5(0, 0) - tmp3;
+      
+  return pow(optRho1, 2) + pow(optRho2, 2);
+//    return Rcpp::List::create(Rcpp::Named("V", V),
+//    Rcpp::Named("Vinv", Vinv),
+//    Rcpp::Named("sqrtU", sqrtU),
+//    Rcpp::Named("sqrtUinv", sqrtUinv),
+//    Rcpp::Named("resid", resid),
+//    Rcpp::Named("phiR", phiR),
+//    Rcpp::Named("tmp1", tmp1),
+//    Rcpp::Named("tmp2", tmp2),
+//    Rcpp::Named("tmp3", tmp3),
+//    Rcpp::Named("tmp4", tmp4),
+//    Rcpp::Named("tmp5", tmp5),
+//    Rcpp::Named("optRho1", optRho1),
+//    Rcpp::Named("optRho2", sqrtU));
+}
+
+
+
