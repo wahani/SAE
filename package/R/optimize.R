@@ -52,65 +52,13 @@ optimizeBeta <- function(modelSpecs) {
 #' @param modelSpecs list with all necessary components for estimation
 optimizeSigma <- function(modelSpecs) {
   
-  updateDerivatives <- updateDerivativesClosure(modelSpecs$nDomains, modelSpecs$nTime, Z1=modelSpecs$Z1, W=modelSpecs$w)
-  
-  optimizerClosure <- function(modelSpecs) {
-    force(modelSpecs)
-    function(sigmas) {
-      
-      modelSpecs$sigma <<- sigmas
-      
-      Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
-      Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-
-      listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
-                       rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
-                       modelSpecs$sigmaSamplingError)
-      V <- listV$V
-      Vinv <- listV$Vinv
-      
-      sqrtU <- updateSqrtU(V=V)
-      sqrtUinv <- diag(1/diag(sqrtU))
-      
-      resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
-      phiR <- modelSpecs$psiFunction(u = resid)
-      
-      derivatives <- list(derVSigma1 = matVderS1(Ome1=Ome1, Z1 = modelSpecs$Z1),
-                          derVSigma2 = matVderS2(Ome2=Ome2, nDomains=modelSpecs$nDomains))
-      
-      ZVuZt <- V 
-      diag(ZVuZt) <- diag(ZVuZt) - modelSpecs$sigmaSamplingError
-      
-      ZVuZtinv <- chol2inv(chol(ZVuZt))
-      
-      Ome1Bar <- Ome2Bar <- matrix(0, nrow = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains,
-                                   ncol = modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)
-      
-      Ome1Bar[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- Ome1
-      Ome2Bar[(modelSpecs$nDomains + 1):NROW(Ome2Bar), (modelSpecs$nDomains + 1):NROW(Ome2Bar)] <- omega2Diag(Ome2, modelSpecs$nDomains)
-            
-      tmp1 <- crossprod(phiR, sqrtU) %*% Vinv
-      
-      a <- c(tmp1 %*% tcrossprod(derivatives$derVSigma1, tmp1),
-             tmp1 %*% tcrossprod(derivatives$derVSigma2, tmp1))
-      
-      tmp2 <- modelSpecs$K * Vinv %*% derivatives$derVSigma1 %*% ZVuZtinv
-      tmp3 <- modelSpecs$K * Vinv %*% derivatives$derVSigma2 %*% ZVuZtinv
-      
-      tmp4 <- modelSpecs$Z %*% tcrossprod(Ome1Bar, modelSpecs$Z)
-      tmp5 <- modelSpecs$Z %*% tcrossprod(Ome2Bar, modelSpecs$Z)
-      
-      A <- diag(nrow = 2)
-      A[1,1] <- matTrace(tmp2 %*% tmp4)
-      A[1,2] <- matTrace(tmp2 %*% tmp5)
-      A[2,1] <- matTrace(tmp3 %*% tmp4)
-      A[2,2] <- matTrace(tmp3 %*% tmp5)
-      
-      return(solve(A) %*% a)
-    }
+  optimizerWrapper <- function(sigma) {
+    optimizerSigma(sigma, y = modelSpecs$y, X = modelSpecs$x, Z1 = modelSpecs$Z1, 
+                   sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
+                   W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z)
   }
-  
-  modelSpecs$sigma <- fp(optimizerClosure(modelSpecs), 
+    
+  modelSpecs$sigma <- fp(optimizerWrapper, 
                          modelSpecs$sigma, 
                          opts = list(tol = modelSpecs$tol, 
                                      maxiter = modelSpecs$maxIter))$x
@@ -124,47 +72,6 @@ optimizeSigma <- function(modelSpecs) {
 #' 
 #' @param modelSpecs list with all necessary components for estimation
 optimizeRho <- function(modelSpecs) {
-  
-  updateDerivatives <- updateDerivativesClosure(modelSpecs$nDomains, modelSpecs$nTime, Z1=modelSpecs$Z1, W=modelSpecs$w)
-  
-  optimizerClosure <- function(modelSpecs) {
-    force(modelSpecs)
-    function(rho) {
-      modelSpecs$rho <<- rho
-      Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
-      Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-      
-      listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
-                       rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
-                       modelSpecs$sigmaSamplingError)
-      
-      V <- listV$V
-      Vinv <- listV$Vinv
-      
-      sqrtU <- updateSqrtU(V=V)
-      sqrtUinv <- diag(1/diag(sqrtU))
-      
-      resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$x %*% modelSpecs$beta)
-      phiR <- modelSpecs$psiFunction(u = resid)
-      
-      derivatives <- list(derVSarCorr = matVderR1(rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
-                                                  Z1=modelSpecs$Z1, Ome1=Ome1, W=modelSpecs$w),
-                          derVArCorr = matVderR2(rho2=modelSpecs$rho[2], sigma2=modelSpecs$sigma[2], 
-                                                 Ome2=Ome2, nDomains=modelSpecs$nDomains))
-            
-      tmp1 <- crossprod(phiR, sqrtU) %*% listV$Vinv
-      #tmp2 <- listV$Vinv %*% sqrtU %*% phiR
-      
-      tmpSig1 <- matTrace(modelSpecs$K * listV$Vinv %*% derivatives$derVSarCorr)
-      tmpSig2 <- matTrace(modelSpecs$K * listV$Vinv %*% derivatives$derVArCorr)
-      
-      optSig1 <- tmp1 %*% tcrossprod(derivatives$derVSarCorr, tmp1) - tmpSig1
-      optSig2 <- tmp1 %*% tcrossprod(derivatives$derVArCorr, tmp1) - tmpSig2
-      
-      return(optSig1^2 + optSig2^2)
-    }
-  }
-  
   modelSpecs$rho <- nloptr(modelSpecs$rho, 
                            optimizerRho,
                           lb = c(-0.99, -0.99), ub = c(0.99, 0.99),
@@ -187,8 +94,7 @@ optimizeRho <- function(modelSpecs) {
 #' @param modelSpecs list with all necessary components for estimation
 #' 
 optimizeParameters <- function(modelSpecs) {
-  
-  
+    
   checkCriterion <- function(modelSpecs, oldParams) 
     !all((c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho) - oldParams)^2 < modelSpecs$tol)
   
@@ -237,15 +143,7 @@ estimateRE <- function(modelSpecs) {
   sqrt.G.tmp.inv=solve(t(svd.G.tmp$v%*%(t(svd.G.tmp$u)*sqrt(svd.G.tmp$d))))
   
   # Variance-Covariance
-   z <- modelSpecs$Z
-#   V <- z%*%G.tmp%*%t(z) + R.tmp
-#   
-#   A <- updateA(sigma2 = modelSpecs$sigma[2], Ome2=ome2Tmp, nDomains = modelSpecs$nDomains, nTime= modelSpecs$nTime,
-#                modelSpecs$sigmaSamplingError)
-#   #V <- updateV(sigma1=modelSpecs$sigma[1], Ome1=Ome1, A=A, Z1=modelSpecs$Z1)
-#   Vinv <- updateSolvedV(sarCorr=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1], 
-#                         arCorr=modelSpecs$rho[2], A=A, Ome1=ome1, Z1=modelSpecs$Z1)
-  
+  z <- modelSpecs$Z
   listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
                    rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
                    modelSpecs$sigmaSamplingError)

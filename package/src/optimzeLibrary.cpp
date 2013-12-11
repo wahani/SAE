@@ -234,5 +234,84 @@ double optimizerRho(arma::colvec rho, arma::colvec y, arma::mat X, double sigma1
 //    Rcpp::Named("optRho2", sqrtU));
 }
 
-
-
+// [[Rcpp::export]]
+arma::colvec optimizerSigma(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K, arma::mat Z) {
+            
+  // Variance-Covarianze matrix
+  Rcpp::List Vlist = matVinv(W, rho(0), sigma(0), rho(1), sigma(1), Z1, sigmaSamplingError);
+  arma::mat V = Vlist(0);
+  arma::mat Vinv = Vlist(1);
+      
+  // sqrt of U + inverse
+  arma::mat sqrtU(V.n_rows, V.n_rows);
+  sqrtU.fill(0.0);
+  sqrtU.diag() = sqrt(V.diag());
+  
+  arma::mat sqrtUinv(V.n_rows, V.n_rows);
+  sqrtUinv.fill(0.0);
+  sqrtUinv.diag() = 1/sqrtU.diag();
+  
+  
+  // residuals and huber
+  arma::colvec resid = sqrtUinv * (y - X * beta);
+  arma::colvec phiR = psiOne(resid);
+  
+  // Derivatives
+  arma::mat Ome1 = reSAR1(W, rho(0));
+  arma::mat Ome2 = reAR1(Z1.n_rows / W.n_rows, rho(1));
+  arma::mat derVSigma1 = matVderS1(Ome1, Z1);
+  arma::mat derVSigma2 = matVderS2(Ome2, W.n_rows);
+  
+  // ZVuZt + inverse
+  arma::mat ZVuZt = V;
+  ZVuZt.diag() -= sigmaSamplingError;
+  arma::mat ZVuZtinv = arma::inv(trimatu(chol(ZVuZt)));
+  ZVuZtinv = ZVuZtinv * ZVuZtinv.t();
+  
+  // OmegaBar
+  arma::mat Ome1Bar(Z.n_cols, Z.n_cols);
+  arma::mat Ome2Bar(Z.n_cols, Z.n_cols);
+  Ome1Bar.fill(0.0);
+  Ome2Bar.fill(0.0);
+  
+  Ome1Bar(arma::span(0, W.n_rows-1), arma::span(0, W.n_rows-1)) = Ome1;
+  Ome2Bar(arma::span(W.n_rows, Ome2Bar.n_rows-1), arma::span(W.n_rows, Ome2Bar.n_rows-1)) = makeBlockDiagonalMat(Ome2, W.n_rows);
+  
+  // Compute a(theta) and A(theta)
+  arma::mat tmp1 = phiR.t() * sqrtU * Vinv;
+  
+  arma::colvec a(2);
+  
+  a(0) = as_scalar(tmp1 * derVSigma1 * tmp1.t());
+  a(1) = as_scalar(tmp1 * derVSigma2 * tmp1.t());
+      
+  arma::mat tmp2 = K * Vinv * derVSigma1 * ZVuZtinv;
+  arma::mat tmp3 = K * Vinv * derVSigma2 * ZVuZtinv;
+      
+  arma::mat tmp4 = Z * Ome1Bar * Z.t();
+  arma::mat tmp5 = Z * Ome2Bar * Z.t();
+  
+  arma::mat A(2,2);
+  A(0,0) = trace(tmp2 * tmp4);
+  A(0,1) = trace(tmp2 * tmp5);
+  A(1,0) = trace(tmp3 * tmp4);
+  A(1,1) = trace(tmp3 * tmp5);
+  
+  return inv(A) * a;
+  
+//    return Rcpp::List::create(Rcpp::Named("V", V),
+//    Rcpp::Named("Vinv", Vinv),
+//    Rcpp::Named("sqrtU", sqrtU),
+//    Rcpp::Named("sqrtUinv", sqrtUinv),
+//    Rcpp::Named("resid", resid),
+//    Rcpp::Named("phiR", phiR),
+//    Rcpp::Named("ZVuZt", ZVuZt),
+//    Rcpp::Named("ZVuZtinv", ZVuZtinv),
+//    Rcpp::Named("tmp1", tmp1),
+//    Rcpp::Named("tmp2", tmp2),
+//    Rcpp::Named("tmp3", tmp3),
+//    Rcpp::Named("tmp4", tmp4),
+//    Rcpp::Named("tmp5", tmp5),
+//    Rcpp::Named("a", a),
+//    Rcpp::Named("A", A));
+}
