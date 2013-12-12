@@ -12,7 +12,7 @@ optimizeBeta <- function(modelSpecs) {
   
   V <- listV$V
   Vinv <- listV$Vinv
-    
+  
   sqrtU <- updateSqrtU(V=V)
   sqrtUinv <- diag(1/diag(sqrtU))
   
@@ -57,12 +57,12 @@ optimizeSigma <- function(modelSpecs) {
                    sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
                    W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z)
   }
-    
+  
   modelSpecs$sigma <- fp(optimizerWrapper, 
                          modelSpecs$sigma, 
                          opts = list(tol = modelSpecs$tol, 
                                      maxiter = modelSpecs$maxIter))$x
-
+  
   return(modelSpecs)
 }
 
@@ -74,10 +74,10 @@ optimizeSigma <- function(modelSpecs) {
 optimizeRho <- function(modelSpecs) {
   modelSpecs$rho <- nloptr(modelSpecs$rho, 
                            optimizerRho,
-                          lb = c(-0.99, -0.99), ub = c(0.99, 0.99),
-                          opts = list(algorithm = "NLOPT_LN_NELDERMEAD",
-                                      xtol_rel = modelSpecs$tol,
-                                      maxeval = modelSpecs$maxIter),
+                           lb = c(-0.99, -0.99), ub = c(0.99, 0.99),
+                           opts = list(algorithm = "NLOPT_LN_NELDERMEAD",
+                                       xtol_rel = modelSpecs$tol,
+                                       maxeval = modelSpecs$maxIter),
                            y = modelSpecs$y, X = modelSpecs$x, sigma1 = modelSpecs$sigma[1], 
                            sigma2 = modelSpecs$sigma[2], Z1 = modelSpecs$Z1, 
                            sigmaSamplingError = modelSpecs$sigmaSamplingError, 
@@ -94,7 +94,7 @@ optimizeRho <- function(modelSpecs) {
 #' @param modelSpecs list with all necessary components for estimation
 #' 
 optimizeParameters <- function(modelSpecs) {
-    
+  
   checkCriterion <- function(modelSpecs, oldParams) 
     !all((c(modelSpecs$beta, modelSpecs$sigma, modelSpecs$rho) - oldParams)^2 < modelSpecs$tol)
   
@@ -108,7 +108,7 @@ optimizeParameters <- function(modelSpecs) {
     modelSpecs <- optimizeBeta(modelSpecs)
     modelSpecs <- optimizeSigma(modelSpecs)
     modelSpecs <- optimizeRho(modelSpecs)
-      
+    
     iter <- iter + 1
   }
   return(modelSpecs)
@@ -125,72 +125,71 @@ optimizeParameters <- function(modelSpecs) {
 estimateRE <- function(modelSpecs) {
   n <- modelSpecs$nDomains*modelSpecs$nTime
   # Sampling Error Component
-  R.tmp=diag(modelSpecs$sigmaSamplingError)
-  svd.R.tmp=svd(R.tmp)
-  sqrt.R.tmp.inv=solve(t(svd.R.tmp$v%*%(t(svd.R.tmp$u)*sqrt(svd.R.tmp$d))))
+  R <- diag(modelSpecs$sigmaSamplingError)
+  svdR <- svd(R)
+  sqrtRinv <- solve(t(svdR$v%*%(t(svdR$u)*sqrt(svdR$d))))
   
   # RE - Spatio-Temporal
-  ome1 <-  updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
-  ome2Tmp <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-  ome2 <- omega2Diag(Ome2=ome2Tmp, nDomains=modelSpecs$nDomains)
-  G.tmp <- matrix(0, ncol = modelSpecs$nDomains + modelSpecs$nDomains * modelSpecs$nTime,
-                  nrow = modelSpecs$nDomains + modelSpecs$nDomains * modelSpecs$nTime)
-  G.tmp[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- modelSpecs$sigma[1] * ome1
-  G.tmp[(modelSpecs$nDomains+1):(modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains), 
-        (modelSpecs$nDomains+1):(modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)] <- modelSpecs$sigma[2] * ome2
+  Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
+  Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
   
-  svd.G.tmp=svd(G.tmp)
-  sqrt.G.tmp.inv=solve(t(svd.G.tmp$v%*%(t(svd.G.tmp$u)*sqrt(svd.G.tmp$d))))
+  G <- matrix(0, ncol = modelSpecs$nDomains + modelSpecs$nDomains * modelSpecs$nTime,
+              nrow = modelSpecs$nDomains + modelSpecs$nDomains * modelSpecs$nTime)
+  
+  G[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- modelSpecs$sigma[1] * Ome1
+  G[(modelSpecs$nDomains+1):(modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains), 
+    (modelSpecs$nDomains+1):(modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)] <- modelSpecs$sigma[2] * omega2Diag(Ome2=Ome2, nDomains=modelSpecs$nDomains)
+  
+  svdG <- svd(G)
+  sqrtGinv <- solve(t(svdG$v%*%(t(svdG$u)*sqrt(svdG$d))))
   
   # Variance-Covariance
-  z <- modelSpecs$Z
+  Z <- modelSpecs$Z
   listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
                    rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
                    modelSpecs$sigmaSamplingError)
   
   V <- listV$V
   Vinv <- listV$Vinv
-    
-  sqrt.u <- updateSqrtU(V=V)
-  sqrt.u.inv <- diag(1/diag(sqrt.u))
+  
+  #   sqrtU <- updateSqrtU(V=V)
+  #   sqrtUinv <- diag(1/diag(sqrtU))
   
   # Starting Values
   y <- modelSpecs$y
-  XS <- modelSpecs$x
-  beta.q <- modelSpecs$beta
-  vv.tmp<-G.tmp%*%t(z)%*%Vinv%*%as.vector(y-XS%*%beta.q)
+  X <- modelSpecs$x
+  beta <- modelSpecs$beta
+  
+  resid <- y - X %*% beta
+  vv <- G %*% t(Z) %*% Vinv %*% as.vector(resid)
   
   # Algorithm
   n <- modelSpecs$nDomains*modelSpecs$nTime
   areanumber <- modelSpecs$nDomains
-  my.psi <- psiOne
   tol <- modelSpecs$tol
   diff.u<-1
-  iter2<-0
+  
+  i<-0
   k_v <- 1.345
   maxit <- modelSpecs$maxIter
   while (abs(diff.u)>tol)
   {
-    consoleOutput(TRUE)
-    iter2<-iter2+1 
-    v_robust=as.vector(vv.tmp)
-    res1<-sqrt.R.tmp.inv%*%(y-XS%*%beta.q-z%*%v_robust)
-    res2<-sqrt.G.tmp.inv%*%v_robust
-    w2<-diag(c(my.psi(res1,k_v)/res1),n,n)
-    w3<-diag(c(my.psi(res2,k_v)/res2),n + areanumber,n + areanumber)
-    Atmp1 <- t(z)%*%(sqrt.R.tmp.inv)%*%w2%*%(sqrt.R.tmp.inv)%*%z
-    Atmp2 <- sqrt.G.tmp.inv%*%w3%*%sqrt.G.tmp.inv
-    A=Atmp1+Atmp2
-    B<-t(z)%*%(sqrt.R.tmp.inv)%*%w2%*%(sqrt.R.tmp.inv)%*%(y-XS%*%beta.q)
-    vv.tmp<-solve(A)%*%B
+    i <- i+1 
+    v_robust <- as.vector(vv)
+    res1 <- sqrtRinv %*% (resid - Z %*% v_robust)
+    res2 <- sqrtGinv %*% v_robust
+    w2 <- diag(c(psiOne(res1, k_v)/res1), n, n)
+    w3 <- diag(c(psiOne(res2, k_v)/res2), n + areanumber, n + areanumber)
+    Atmp1 <- t(Z) %*% (sqrtRinv) %*% w2 %*%(sqrtRinv) %*% Z
+    Atmp2 <- sqrtGinv %*% w3 %*% sqrtGinv
+    A <- Atmp1 + Atmp2
+    B <- t(Z) %*% sqrtRinv %*% w2 %*% sqrtRinv %*% resid
+    vv <- solve(A) %*% B
     
-    diff.u<-sum((vv.tmp-v_robust)^2)
-    if (iter2>maxit)
-    {warning(paste("failed to converge in", maxit, "steps"))
-     break}
+    diff.u<-sum((vv-v_robust)^2)
+    if (i > maxit) break
   }
   
-  modelSpecs$u <- as.numeric(z %*% as.numeric(vv.tmp))
+  modelSpecs$u <- as.numeric(Z %*% as.numeric(vv))
   return(modelSpecs)
 }
-
