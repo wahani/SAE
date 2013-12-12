@@ -315,3 +315,76 @@ arma::colvec optimizerSigma(arma::colvec sigma, arma::colvec rho, arma::colvec y
 //    Rcpp::Named("a", a),
 //    Rcpp::Named("A", A));
 }
+
+
+// [[Rcpp::export]]
+arma::colvec optimizeRE(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K, arma::mat Z, double tol, int maxit) {
+  
+  int n = Z.n_rows;
+  
+  // sqrt of R inverse
+  arma::mat sqrtRinv(n, n); sqrtRinv.fill(0.0); sqrtRinv.diag() = 1/sqrt(sigmaSamplingError);
+  
+  // RE - Spatio-Temporal
+  arma::mat Ome1 = reSAR1(W, rho(0));
+  arma::mat Ome2 = reAR1(Z1.n_rows / W.n_rows, rho(1));
+  
+  arma::mat G(Z.n_cols, Z.n_cols); G.fill(0.0);
+  G(arma::span(0, W.n_rows-1), arma::span(0, W.n_rows-1)) = sigma(0) * Ome1;
+  G(arma::span(W.n_rows, G.n_rows-1), arma::span(W.n_rows, G.n_rows-1)) = sigma(1) * makeBlockDiagonalMat(Ome2, W.n_rows);
+    
+  arma::vec eigval;
+  arma::mat eigvec;
+  eig_sym(eigval, eigvec, G);
+
+  arma::mat sqrtGinv = eigvec * arma::diagmat(sqrt(1/eigval)) * eigvec.t();
+  
+  // Variance-Covarianze matrix
+  Rcpp::List Vlist = matVinv(W, rho(0), sigma(0), rho(1), sigma(1), Z1, sigmaSamplingError);
+  arma::mat V = Vlist(0);
+  arma::mat Vinv = Vlist(1);
+  
+  arma::colvec resid = y - X * beta;
+  arma::colvec vv = G * Z.t() * Vinv * resid;
+  
+  // Algorithm
+  int nDomains = W.n_rows;
+  double diff = 1.0;
+  
+  int i = 0;
+  arma::mat tmp = Z.t() * sqrtRinv;
+  
+  while (diff > tol)
+  {
+    i++;
+    arma::colvec v_robust = vv;
+    arma::colvec res1 = sqrtRinv * (resid - Z * v_robust);
+    arma::colvec res2 = sqrtGinv * v_robust;
+    
+    arma::mat w2 = arma::diagmat(psiOne(res1)/res1);
+    arma::mat w3 = arma::diagmat(psiOne(res2)/res2);
+    
+    arma::mat tmp1 = tmp * w2 * sqrtRinv;
+    arma::mat Atmp1 =  tmp1 * Z;
+    arma::mat Atmp2 = sqrtGinv * w3 * sqrtGinv;
+    arma::mat A = Atmp1 + Atmp2;
+    arma::mat B = tmp1 * resid;
+    
+    vv = inv(A) * B;
+    
+    diff = sum(pow(vv-v_robust, 2));
+    if (i > maxit) break;
+  }
+  
+  return Z * vv;
+  
+//    return Rcpp::List::create(Rcpp::Named("G", G),
+//    Rcpp::Named("sqrtGinv", sqrtGinv),
+//    Rcpp::Named("sqrtRinv", sqrtRinv),
+//    Rcpp::Named("resid", resid),
+//    Rcpp::Named("vv", vv),
+//    Rcpp::Named("v_robust", v_robust),
+//    Rcpp::Named("res1", res2),
+//    Rcpp::Named("A", A),
+//    Rcpp::Named("B", B));
+}

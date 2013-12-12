@@ -123,73 +123,12 @@ optimizeParameters <- function(modelSpecs) {
 #' @param modelSpecs list with all necessary components for estimation
 #' 
 estimateRE <- function(modelSpecs) {
-  n <- modelSpecs$nDomains*modelSpecs$nTime
-  # Sampling Error Component
-  R <- diag(modelSpecs$sigmaSamplingError)
-  svdR <- svd(R)
-  sqrtRinv <- solve(t(svdR$v%*%(t(svdR$u)*sqrt(svdR$d))))
+
+   u <- optimizeRE(modelSpecs$sigma, y = modelSpecs$y, X = modelSpecs$x, Z1 = modelSpecs$Z1, 
+             sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
+             W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z, tol = modelSpecs$tol, maxit = modelSpecs$maxIter)
+   
+   modelSpecs$u <- as.numeric(u)
   
-  # RE - Spatio-Temporal
-  Ome1 <- updateOmega1(sarCorr=modelSpecs$rho[1], w0=modelSpecs$w0)
-  Ome2 <- updateOmega2(arCorr=modelSpecs$rho[2], nTime=modelSpecs$nTime)
-  
-  G <- matrix(0, ncol = modelSpecs$nDomains + modelSpecs$nDomains * modelSpecs$nTime,
-              nrow = modelSpecs$nDomains + modelSpecs$nDomains * modelSpecs$nTime)
-  
-  G[1:modelSpecs$nDomains, 1:modelSpecs$nDomains] <- modelSpecs$sigma[1] * Ome1
-  G[(modelSpecs$nDomains+1):(modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains), 
-    (modelSpecs$nDomains+1):(modelSpecs$nDomains * modelSpecs$nTime + modelSpecs$nDomains)] <- modelSpecs$sigma[2] * omega2Diag(Ome2=Ome2, nDomains=modelSpecs$nDomains)
-  
-  svdG <- svd(G)
-  sqrtGinv <- solve(t(svdG$v%*%(t(svdG$u)*sqrt(svdG$d))))
-  
-  # Variance-Covariance
-  Z <- modelSpecs$Z
-  listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
-                   rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
-                   modelSpecs$sigmaSamplingError)
-  
-  V <- listV$V
-  Vinv <- listV$Vinv
-  
-  #   sqrtU <- updateSqrtU(V=V)
-  #   sqrtUinv <- diag(1/diag(sqrtU))
-  
-  # Starting Values
-  y <- modelSpecs$y
-  X <- modelSpecs$x
-  beta <- modelSpecs$beta
-  
-  resid <- y - X %*% beta
-  vv <- G %*% t(Z) %*% Vinv %*% as.vector(resid)
-  
-  # Algorithm
-  n <- modelSpecs$nDomains*modelSpecs$nTime
-  areanumber <- modelSpecs$nDomains
-  tol <- modelSpecs$tol
-  diff.u<-1
-  
-  i<-0
-  k_v <- 1.345
-  maxit <- modelSpecs$maxIter
-  while (abs(diff.u)>tol)
-  {
-    i <- i+1 
-    v_robust <- as.vector(vv)
-    res1 <- sqrtRinv %*% (resid - Z %*% v_robust)
-    res2 <- sqrtGinv %*% v_robust
-    w2 <- diag(c(psiOne(res1, k_v)/res1), n, n)
-    w3 <- diag(c(psiOne(res2, k_v)/res2), n + areanumber, n + areanumber)
-    Atmp1 <- t(Z) %*% (sqrtRinv) %*% w2 %*%(sqrtRinv) %*% Z
-    Atmp2 <- sqrtGinv %*% w3 %*% sqrtGinv
-    A <- Atmp1 + Atmp2
-    B <- t(Z) %*% sqrtRinv %*% w2 %*% sqrtRinv %*% resid
-    vv <- solve(A) %*% B
-    
-    diff.u<-sum((vv-v_robust)^2)
-    if (i > maxit) break
-  }
-  
-  modelSpecs$u <- as.numeric(Z %*% as.numeric(vv))
   return(modelSpecs)
 }
