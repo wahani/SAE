@@ -15,6 +15,8 @@ fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
   startRho <- c(simSetup@sarCorr, simSetup@arCorr)
   
   datList <- slot(simSetup, "data")
+   
+  setPTOption(c("spatioTemporalData", "SAE"))
   
   predictionList <- parallelTools::mclapply(datList,
                                             function(dat) {
@@ -28,8 +30,8 @@ fitSimSetup <- function(fitFunction, simSetup, mc.cores = detectCores()) {
                                               fit$estimates
                                             }, 
                                             mc.cores = mc.cores,
-                                            mc.preschedule = FALSE, 
-                                            packageToLoad = c("spatioTemporalData", "SAE"))
+                                            mc.preschedule = FALSE)
+  
   
   predictionList[grepl("try-error", sapply(predictionList, class))] <- 
     list(rep(NA, simSetup@nDomains * simSetup@nTime))

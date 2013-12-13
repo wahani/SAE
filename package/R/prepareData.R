@@ -1,4 +1,4 @@
-prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter) {
+prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter, k = 1.345) {
   
   dat <- dat[order(dat$Domain, dat$Time), ]
   XY <- makeXY(formula, dat)
@@ -27,7 +27,8 @@ prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSa
                      # Specs for estimation
                      tol = tol,
                      psiFunction = psiOne,
-                     K = 0.71,
+                     k = k,
+                     K = 2 * pnorm(k) - 1 - 2 * k * dnorm(k) + 2 * (k^2) * (1-pnorm(k)),
                      method = method,
                      maxIter = maxIter,
                      consoleOutput = TRUE,
