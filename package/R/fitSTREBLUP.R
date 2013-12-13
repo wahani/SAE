@@ -31,9 +31,10 @@ fitSTREBLUP <- function(formula, dat, beta, sigma, rho,
                         nTime = getNTime(dat),
                         w0 = w0Matrix(nDomains), 
                         w = w0/rowSums(w0),
-                        tol = 1e-3, method = "Nelder-Mead", maxIter = 500) {
+                        tol = 1e-3, method = "Nelder-Mead", maxIter = 500,
+                        k = 1.345) {
   
-  modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter)
+  modelSpecs <- prepareData(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSamplingError, w0, w, tol, method, maxIter, k)
   
   #try-catch handling for parameter estimation
   modelFit <- try(optimizeParameters(modelSpecs), silent = TRUE)
