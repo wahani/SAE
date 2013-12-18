@@ -106,7 +106,7 @@ simScenario <- function(sigma, sigmaCont, ...) {
                                spatioTemporalMessup = FALSE, scenarioName = "(0, 0, 0.5, 0.5)", 
                                ...)
   
-  output <- c(svvpp, recursive=TRUE)
+  output <- c(s00pp, recursive=TRUE)
   
 }
 
@@ -130,11 +130,14 @@ Z1 <- reZ1(nDomains=simSetup@nDomains, nTime=simSetup@nTime)
 
 
 system.time(
-tmp1 <- fitSTREBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
+tmp1 <- fitSTEBLUP(y~x, dat, c(100,1), c(1,1), c(0.5, 0.5))
 )
 tmp1$beta
 tmp1$rho
 tmp1$sigma
+
+reSTEBLUP <- tmp1$estimates
+
 
 # 
 # 

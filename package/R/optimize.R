@@ -63,6 +63,7 @@ optimizeSigma <- function(modelSpecs) {
                          opts = list(tol = modelSpecs$tol, 
                                      maxiter = modelSpecs$maxIter))$x
   
+
   return(modelSpecs)
 }
 
