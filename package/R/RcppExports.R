@@ -89,7 +89,7 @@ optimizerSigma <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K,
     .Call('SAE_optimizerSigma', PACKAGE = 'SAE', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z)
 }
 
-optimizeRE <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z, tol, maxit) {
-    .Call('SAE_optimizeRE', PACKAGE = 'SAE', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z, tol, maxit)
+optimizeRESTR <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit) {
+    .Call('SAE_optimizeRESTR', PACKAGE = 'SAE', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit)
 }
 

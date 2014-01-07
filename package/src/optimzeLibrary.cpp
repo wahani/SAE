@@ -316,75 +316,98 @@ arma::colvec optimizerSigma(arma::colvec sigma, arma::colvec rho, arma::colvec y
 //    Rcpp::Named("A", A));
 }
 
+Rcpp::List matRST(arma::colvec sigmaSamplingError) {
+  
+  arma::mat R = arma::diagmat(sigmaSamplingError);
+  arma::mat Rinv = arma::diagmat(1/sigmaSamplingError);
+  arma::mat sqrtRinv = arma::diagmat(1/sqrt(sigmaSamplingError));
+  
+  return Rcpp::List::create(Rcpp::Named("R", R),
+    Rcpp::Named("Rinv", Rinv),
+    Rcpp::Named("sqrtRinv", sqrtRinv));
+  
+}
 
-// [[Rcpp::export]]
-arma::colvec optimizeRE(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K, arma::mat Z, double tol, int maxit) {
+Rcpp::List matGST(arma::colvec sigma, arma::colvec rho, arma::mat W, int nDomains, int nTime) {
   
-  int n = Z.n_rows;
-  
-  // sqrt of R inverse
-  arma::mat sqrtRinv(n, n); sqrtRinv.fill(0.0); sqrtRinv.diag() = 1/sqrt(sigmaSamplingError);
-  
-  // RE - Spatio-Temporal
+  // G
   arma::mat Ome1 = reSAR1(W, rho(0));
-  arma::mat Ome2 = reAR1(Z1.n_rows / W.n_rows, rho(1));
+  arma::mat Ome2 = reAR1(nTime, rho(1));
   
-  arma::mat G(Z.n_cols, Z.n_cols); G.fill(0.0);
+  arma::mat G(nDomains + nDomains * nTime, nDomains + nDomains * nTime); G.fill(0.0);
   G(arma::span(0, W.n_rows-1), arma::span(0, W.n_rows-1)) = sigma(0) * Ome1;
-  G(arma::span(W.n_rows, G.n_rows-1), arma::span(W.n_rows, G.n_rows-1)) = sigma(1) * makeBlockDiagonalMat(Ome2, W.n_rows);
-    
+  G(arma::span(W.n_rows, G.n_rows-1), arma::span(W.n_rows, G.n_rows-1)) = sigma(1) * makeBlockDiagonalMat(Ome2, nDomains);
+  
+  // sqrt of G inverse
   arma::vec eigval;
   arma::mat eigvec;
   eig_sym(eigval, eigvec, G);
 
   arma::mat sqrtGinv = eigvec * arma::diagmat(sqrt(1/eigval)) * eigvec.t();
+  arma::mat Ginv = eigvec * arma::diagmat(1/eigval) * eigvec.t();
   
-  // Variance-Covarianze matrix
-  Rcpp::List Vlist = matVinv(W, rho(0), sigma(0), rho(1), sigma(1), Z1, sigmaSamplingError);
-  arma::mat V = Vlist(0);
-  arma::mat Vinv = Vlist(1);
+  return Rcpp::List::create(Rcpp::Named("G", G),
+    Rcpp::Named("Ginv", Ginv),
+    Rcpp::Named("sqrtGinv", sqrtGinv));
   
+}
+
+arma::colvec optimizerRE(arma::colvec vv, arma::colvec y, arma::mat X, arma::colvec beta, arma::colvec resid, arma::mat Z, arma::mat Vinv, arma::mat sqrtRinv, arma::mat G, arma::mat sqrtGinv, arma::mat ZtsqrtRinv) {
+  
+  arma::mat tmp = Z.t() * sqrtRinv;
+  arma::colvec v_robust = vv;
+  arma::colvec res1 = sqrtRinv * (resid - Z * v_robust);
+  arma::colvec res2 = sqrtGinv * v_robust;
+  
+  arma::mat w2 = arma::diagmat(psiOne(res1)/res1);
+  arma::mat w3 = arma::diagmat(psiOne(res2)/res2);
+  
+  arma::mat tmp1 = tmp * w2 * sqrtRinv;
+  arma::mat Atmp1 =  tmp1 * Z;
+  arma::mat Atmp2 = sqrtGinv * w3 * sqrtGinv;
+  arma::mat A = Atmp1 + Atmp2;
+  arma::mat B = tmp1 * resid;
+  
+  vv = inv(A) * B;  
+  
+  return vv;
+  
+}
+
+// [[Rcpp::export]]
+arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double K, arma::mat Z, double tol, int maxit) {
+ 
+  // R
+  Rcpp::List listR = matRST(sigmaSamplingError);
+  arma::mat sqrtRinv = listR(2);
+ 
+  // G
+  Rcpp::List listG = matGST(sigma, rho, W, nDomains, nTime);
+  arma::mat G = listG(0);
+  arma::mat sqrtGinv = listG(2);
+  
+  // V
+  Rcpp::List listV = matVinv(W, rho(0), sigma(0), rho(1), sigma(1), Z1, sigmaSamplingError);
+  arma::mat Vinv = listV(1);
+  
+  // 
   arma::colvec resid = y - X * beta;
+  arma::mat ZtsqrtRinv = Z.t() * sqrtRinv;
+  
+  // Starting Values
   arma::colvec vv = G * Z.t() * Vinv * resid;
   
   // Algorithm
-  int nDomains = W.n_rows;
+  int i = 0;
   double diff = 1.0;
   
-  int i = 0;
-  arma::mat tmp = Z.t() * sqrtRinv;
-  
-  while (diff > tol)
-  {
+  while(diff > tol) {
     i++;
-    arma::colvec v_robust = vv;
-    arma::colvec res1 = sqrtRinv * (resid - Z * v_robust);
-    arma::colvec res2 = sqrtGinv * v_robust;
-    
-    arma::mat w2 = arma::diagmat(psiOne(res1)/res1);
-    arma::mat w3 = arma::diagmat(psiOne(res2)/res2);
-    
-    arma::mat tmp1 = tmp * w2 * sqrtRinv;
-    arma::mat Atmp1 =  tmp1 * Z;
-    arma::mat Atmp2 = sqrtGinv * w3 * sqrtGinv;
-    arma::mat A = Atmp1 + Atmp2;
-    arma::mat B = tmp1 * resid;
-    
-    vv = inv(A) * B;
-    
-    diff = sum(pow(vv-v_robust, 2));
+    arma::colvec vvTest = vv;
+    vv = optimizerRE(vv, y, X, beta, resid, Z, Vinv, sqrtRinv, G, sqrtGinv, ZtsqrtRinv);
+    diff = sum(pow(vv-vvTest, 2));
     if (i > maxit) break;
   }
-  
+ 
   return Z * vv;
-  
-//    return Rcpp::List::create(Rcpp::Named("G", G),
-//    Rcpp::Named("sqrtGinv", sqrtGinv),
-//    Rcpp::Named("sqrtRinv", sqrtRinv),
-//    Rcpp::Named("resid", resid),
-//    Rcpp::Named("vv", vv),
-//    Rcpp::Named("v_robust", v_robust),
-//    Rcpp::Named("res1", res2),
-//    Rcpp::Named("A", A),
-//    Rcpp::Named("B", B));
 }

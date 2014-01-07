@@ -124,12 +124,9 @@ optimizeParameters <- function(modelSpecs) {
 #' @param modelSpecs list with all necessary components for estimation
 #' 
 estimateRE <- function(modelSpecs) {
-
-   u <- optimizeRE(modelSpecs$sigma, y = modelSpecs$y, X = modelSpecs$x, Z1 = modelSpecs$Z1, 
-             sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
-             W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z, tol = modelSpecs$tol, maxit = modelSpecs$maxIter)
-   
-   modelSpecs$u <- as.numeric(u)
+  
+  u <- optimizeRE(modelSpecs)
+  modelSpecs$u <- as.numeric(u)
   
   return(modelSpecs)
 }

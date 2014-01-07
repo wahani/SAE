@@ -398,9 +398,9 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// optimizeRE
-arma::colvec optimizeRE(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K, arma::mat Z, double tol, int maxit);
-RcppExport SEXP SAE_optimizeRE(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP KSEXP, SEXP ZSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
+// optimizeRESTR
+arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double K, arma::mat Z, double tol, int maxit);
+RcppExport SEXP SAE_optimizeRESTR(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP nDomainsSEXP, SEXP nTimeSEXP, SEXP KSEXP, SEXP ZSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -413,11 +413,13 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< arma::colvec >::type sigmaSamplingError(sigmaSamplingErrorSEXP );
         Rcpp::traits::input_parameter< arma::mat >::type W(WSEXP );
         Rcpp::traits::input_parameter< arma::colvec >::type beta(betaSEXP );
+        Rcpp::traits::input_parameter< int >::type nDomains(nDomainsSEXP );
+        Rcpp::traits::input_parameter< int >::type nTime(nTimeSEXP );
         Rcpp::traits::input_parameter< double >::type K(KSEXP );
         Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP );
         Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
         Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP );
-        arma::colvec __result = optimizeRE(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z, tol, maxit);
+        arma::colvec __result = optimizeRESTR(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

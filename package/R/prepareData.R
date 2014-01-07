@@ -35,5 +35,6 @@ prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSa
                      
                      # "Empty" Vector of Random Effects Estimates
                      u = numeric(nDomains * nTime))
+  class(modelSpecs) <- c("MSSTR")
   return(modelSpecs)
 }
