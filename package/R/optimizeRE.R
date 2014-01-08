@@ -12,9 +12,9 @@ optimizeRE <- function(modelSpecs) {
 
 #' @rdname optimizeRE
 #' @S3method optimizeRE MSSTR
-optimizeRE.MSSTR <- function(modelSpecs) {
+optimizeRE.MSSTRFH <- function(modelSpecs) {
   optimizeRESTR(modelSpecs$sigma, modelSpecs$rho, 
-                modelSpecs$y, modelSpecs$x, modelSpecs$Z1, modelSpecs$sigmaSamplingError, 
+                modelSpecs$y, modelSpecs$X, modelSpecs$Z1, modelSpecs$sigmaSamplingError, 
                 modelSpecs$w, modelSpecs$beta, modelSpecs$nDomains, modelSpecs$nTime, 
                 modelSpecs$K, modelSpecs$Z, modelSpecs$tol, modelSpecs$maxIter)
 }

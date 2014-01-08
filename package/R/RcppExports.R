@@ -2,94 +2,94 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 cppArmFunc <- function(X) {
-    .Call('SAE_cppArmFunc', PACKAGE = 'SAE', X)
+    .Call('saedevel_cppArmFunc', PACKAGE = 'saedevel', X)
 }
 
 cppArmFuncOpt <- function(X) {
-    .Call('SAE_cppArmFuncOpt', PACKAGE = 'SAE', X)
+    .Call('saedevel_cppArmFuncOpt', PACKAGE = 'saedevel', X)
 }
 
 cppArmFuncPseudo <- function(X) {
-    .Call('SAE_cppArmFuncPseudo', PACKAGE = 'SAE', X)
+    .Call('saedevel_cppArmFuncPseudo', PACKAGE = 'saedevel', X)
 }
 
 cppArmFuncChol <- function(X) {
-    .Call('SAE_cppArmFuncChol', PACKAGE = 'SAE', X)
+    .Call('saedevel_cppArmFuncChol', PACKAGE = 'saedevel', X)
 }
 
 cppChol <- function(X) {
-    .Call('SAE_cppChol', PACKAGE = 'SAE', X)
+    .Call('saedevel_cppChol', PACKAGE = 'saedevel', X)
 }
 
 cppChol2Inv <- function(X) {
-    .Call('SAE_cppChol2Inv', PACKAGE = 'SAE', X)
+    .Call('saedevel_cppChol2Inv', PACKAGE = 'saedevel', X)
 }
 
 reSAR1 <- function(W, rho) {
-    .Call('SAE_reSAR1', PACKAGE = 'SAE', W, rho)
+    .Call('saedevel_reSAR1', PACKAGE = 'saedevel', W, rho)
 }
 
 reAR1 <- function(nTime, rho) {
-    .Call('SAE_reAR1', PACKAGE = 'SAE', nTime, rho)
+    .Call('saedevel_reAR1', PACKAGE = 'saedevel', nTime, rho)
 }
 
 makeBlockDiagonalMat <- function(X, n) {
-    .Call('SAE_makeBlockDiagonalMat', PACKAGE = 'SAE', X, n)
+    .Call('saedevel_makeBlockDiagonalMat', PACKAGE = 'saedevel', X, n)
 }
 
 matA <- function(sigma2, Ome2, nDomains, sigmaSamplingError) {
-    .Call('SAE_matA', PACKAGE = 'SAE', sigma2, Ome2, nDomains, sigmaSamplingError)
+    .Call('saedevel_matA', PACKAGE = 'saedevel', sigma2, Ome2, nDomains, sigmaSamplingError)
 }
 
 matVinv <- function(W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError) {
-    .Call('SAE_matVinv', PACKAGE = 'SAE', W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError)
+    .Call('saedevel_matVinv', PACKAGE = 'saedevel', W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError)
 }
 
 matV <- function(W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError) {
-    .Call('SAE_matV', PACKAGE = 'SAE', W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError)
+    .Call('saedevel_matV', PACKAGE = 'saedevel', W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError)
 }
 
 matVinv1 <- function(W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError) {
-    .Call('SAE_matVinv1', PACKAGE = 'SAE', W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError)
+    .Call('saedevel_matVinv1', PACKAGE = 'saedevel', W, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError)
 }
 
 matP <- function(solvedV, X) {
-    .Call('SAE_matP', PACKAGE = 'SAE', solvedV, X)
+    .Call('saedevel_matP', PACKAGE = 'saedevel', solvedV, X)
 }
 
 matVderS1 <- function(Ome1, Z1) {
-    .Call('SAE_matVderS1', PACKAGE = 'SAE', Ome1, Z1)
+    .Call('saedevel_matVderS1', PACKAGE = 'saedevel', Ome1, Z1)
 }
 
 matVderS2 <- function(Ome2, nDomains) {
-    .Call('SAE_matVderS2', PACKAGE = 'SAE', Ome2, nDomains)
+    .Call('saedevel_matVderS2', PACKAGE = 'saedevel', Ome2, nDomains)
 }
 
 matVderR1 <- function(rho1, sigma1, Z1, Ome1, W) {
-    .Call('SAE_matVderR1', PACKAGE = 'SAE', rho1, sigma1, Z1, Ome1, W)
+    .Call('saedevel_matVderR1', PACKAGE = 'saedevel', rho1, sigma1, Z1, Ome1, W)
 }
 
 matVderR2 <- function(rho2, sigma2, Ome2, nDomains) {
-    .Call('SAE_matVderR2', PACKAGE = 'SAE', rho2, sigma2, Ome2, nDomains)
+    .Call('saedevel_matVderR2', PACKAGE = 'saedevel', rho2, sigma2, Ome2, nDomains)
 }
 
 blue <- function(y, X, Vinv) {
-    .Call('SAE_blue', PACKAGE = 'SAE', y, X, Vinv)
+    .Call('saedevel_blue', PACKAGE = 'saedevel', y, X, Vinv)
 }
 
 llr <- function(y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W) {
-    .Call('SAE_llr', PACKAGE = 'SAE', y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W)
+    .Call('saedevel_llr', PACKAGE = 'saedevel', y, X, rho1, sigma1, rho2, sigma2, Z1, sigmaSamplingError, W)
 }
 
 optimizerRho <- function(rho, y, X, sigma1, sigma2, Z1, sigmaSamplingError, W, beta, K) {
-    .Call('SAE_optimizerRho', PACKAGE = 'SAE', rho, y, X, sigma1, sigma2, Z1, sigmaSamplingError, W, beta, K)
+    .Call('saedevel_optimizerRho', PACKAGE = 'saedevel', rho, y, X, sigma1, sigma2, Z1, sigmaSamplingError, W, beta, K)
 }
 
 optimizerSigma <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z) {
-    .Call('SAE_optimizerSigma', PACKAGE = 'SAE', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z)
+    .Call('saedevel_optimizerSigma', PACKAGE = 'saedevel', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z)
 }
 
 optimizeRESTR <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit) {
-    .Call('SAE_optimizeRESTR', PACKAGE = 'SAE', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit)
+    .Call('saedevel_optimizeRESTR', PACKAGE = 'saedevel', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit)
 }
 

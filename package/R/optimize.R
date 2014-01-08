@@ -6,9 +6,7 @@
 optimizeBeta <- function(modelSpecs) {
   #update necessary components
   
-  listV <- matVinv(W=modelSpecs$w, rho1=modelSpecs$rho[1], sigma1=modelSpecs$sigma[1],
-                   rho2 = modelSpecs$rho[2], sigma2 = modelSpecs$sigma[2], Z1=modelSpecs$Z1,
-                   modelSpecs$sigmaSamplingError)
+  listV <- compV(modelSpecs)
   
   V <- listV$V
   Vinv <- listV$Vinv
@@ -17,7 +15,7 @@ optimizeBeta <- function(modelSpecs) {
   sqrtUinv <- diag(1/diag(sqrtU))
   
   # Some precalculations:
-  tmp1 <- crossprod(modelSpecs$x, Vinv)
+  tmp1 <- crossprod(modelSpecs$X, Vinv)
   tmp2 <- tmp1 %*% sqrtU
   
   # Initilize vectors for beta coefficients:
@@ -30,12 +28,11 @@ optimizeBeta <- function(modelSpecs) {
     
     beta <- newBeta
     
-    resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$x %*% beta)
+    resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$X %*% beta)
     dOfBeta <- diag(as.numeric(modelSpecs$psiFunction(u = resid, deriv = 1)))
-    tmp3 <- tmp1 %*% dOfBeta %*% modelSpecs$x
-    #tmp3 <- tmp1 %*% modelSpecs$x
+    tmp3 <- tmp1 %*% dOfBeta %*% modelSpecs$X
     tmp4 <- solve(tmp3)
-    tmp5 <- tmp2 %*% modelSpecs$psiFunction(u = resid)
+    tmp5 <- tmp2 %*% modelSpecs$psiFunction(u = resid, k = modelSpecs$k)
     
     newBeta <- beta + tmp4 %*% tmp5
     #cat(iter)
@@ -53,7 +50,7 @@ optimizeBeta <- function(modelSpecs) {
 optimizeSigma <- function(modelSpecs) {
   
   optimizerWrapper <- function(sigma) {
-    optimizerSigma(sigma, y = modelSpecs$y, X = modelSpecs$x, Z1 = modelSpecs$Z1, 
+    optimizerSigma(sigma, y = modelSpecs$y, X = modelSpecs$X, Z1 = modelSpecs$Z1, 
                    sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
                    W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z)
   }
@@ -79,7 +76,7 @@ optimizeRho <- function(modelSpecs) {
                            opts = list(algorithm = "NLOPT_LN_NELDERMEAD",
                                        xtol_rel = modelSpecs$tol,
                                        maxeval = modelSpecs$maxIter),
-                           y = modelSpecs$y, X = modelSpecs$x, sigma1 = modelSpecs$sigma[1], 
+                           y = modelSpecs$y, X = modelSpecs$X, sigma1 = modelSpecs$sigma[1], 
                            sigma2 = modelSpecs$sigma[2], Z1 = modelSpecs$Z1, 
                            sigmaSamplingError = modelSpecs$sigmaSamplingError, 
                            W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K)$solution

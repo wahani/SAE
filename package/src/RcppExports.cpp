@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // cppArmFunc
 arma::mat cppArmFunc(arma::mat X);
-RcppExport SEXP SAE_cppArmFunc(SEXP XSEXP) {
+RcppExport SEXP saedevel_cppArmFunc(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -23,7 +23,7 @@ END_RCPP
 }
 // cppArmFuncOpt
 arma::mat cppArmFuncOpt(arma::mat X);
-RcppExport SEXP SAE_cppArmFuncOpt(SEXP XSEXP) {
+RcppExport SEXP saedevel_cppArmFuncOpt(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -38,7 +38,7 @@ END_RCPP
 }
 // cppArmFuncPseudo
 arma::mat cppArmFuncPseudo(arma::mat X);
-RcppExport SEXP SAE_cppArmFuncPseudo(SEXP XSEXP) {
+RcppExport SEXP saedevel_cppArmFuncPseudo(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -53,7 +53,7 @@ END_RCPP
 }
 // cppArmFuncChol
 arma::mat cppArmFuncChol(arma::mat X);
-RcppExport SEXP SAE_cppArmFuncChol(SEXP XSEXP) {
+RcppExport SEXP saedevel_cppArmFuncChol(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -68,7 +68,7 @@ END_RCPP
 }
 // cppChol
 arma::mat cppChol(arma::mat X);
-RcppExport SEXP SAE_cppChol(SEXP XSEXP) {
+RcppExport SEXP saedevel_cppChol(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -83,7 +83,7 @@ END_RCPP
 }
 // cppChol2Inv
 arma::mat cppChol2Inv(arma::mat X);
-RcppExport SEXP SAE_cppChol2Inv(SEXP XSEXP) {
+RcppExport SEXP saedevel_cppChol2Inv(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -98,7 +98,7 @@ END_RCPP
 }
 // reSAR1
 arma::mat reSAR1(arma::mat W, double rho);
-RcppExport SEXP SAE_reSAR1(SEXP WSEXP, SEXP rhoSEXP) {
+RcppExport SEXP saedevel_reSAR1(SEXP WSEXP, SEXP rhoSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -114,7 +114,7 @@ END_RCPP
 }
 // reAR1
 arma::mat reAR1(int nTime, double rho);
-RcppExport SEXP SAE_reAR1(SEXP nTimeSEXP, SEXP rhoSEXP) {
+RcppExport SEXP saedevel_reAR1(SEXP nTimeSEXP, SEXP rhoSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -130,7 +130,7 @@ END_RCPP
 }
 // makeBlockDiagonalMat
 arma::mat makeBlockDiagonalMat(arma::mat X, int n);
-RcppExport SEXP SAE_makeBlockDiagonalMat(SEXP XSEXP, SEXP nSEXP) {
+RcppExport SEXP saedevel_makeBlockDiagonalMat(SEXP XSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -146,7 +146,7 @@ END_RCPP
 }
 // matA
 arma::mat matA(double sigma2, arma::mat Ome2, int nDomains, arma::colvec sigmaSamplingError);
-RcppExport SEXP SAE_matA(SEXP sigma2SEXP, SEXP Ome2SEXP, SEXP nDomainsSEXP, SEXP sigmaSamplingErrorSEXP) {
+RcppExport SEXP saedevel_matA(SEXP sigma2SEXP, SEXP Ome2SEXP, SEXP nDomainsSEXP, SEXP sigmaSamplingErrorSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -164,7 +164,7 @@ END_RCPP
 }
 // matVinv
 Rcpp::List matVinv(arma::mat W, double rho1, double sigma1, double rho2, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError);
-RcppExport SEXP SAE_matVinv(SEXP WSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP) {
+RcppExport SEXP saedevel_matVinv(SEXP WSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -185,7 +185,7 @@ END_RCPP
 }
 // matV
 arma::mat matV(arma::mat W, double rho1, double sigma1, double rho2, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError);
-RcppExport SEXP SAE_matV(SEXP WSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP) {
+RcppExport SEXP saedevel_matV(SEXP WSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -206,7 +206,7 @@ END_RCPP
 }
 // matVinv1
 Rcpp::List matVinv1(arma::mat W, double rho1, double sigma1, double rho2, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError);
-RcppExport SEXP SAE_matVinv1(SEXP WSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP) {
+RcppExport SEXP saedevel_matVinv1(SEXP WSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -227,7 +227,7 @@ END_RCPP
 }
 // matP
 arma::mat matP(arma::mat solvedV, arma::mat X);
-RcppExport SEXP SAE_matP(SEXP solvedVSEXP, SEXP XSEXP) {
+RcppExport SEXP saedevel_matP(SEXP solvedVSEXP, SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -243,7 +243,7 @@ END_RCPP
 }
 // matVderS1
 arma::mat matVderS1(arma::mat Ome1, arma::mat Z1);
-RcppExport SEXP SAE_matVderS1(SEXP Ome1SEXP, SEXP Z1SEXP) {
+RcppExport SEXP saedevel_matVderS1(SEXP Ome1SEXP, SEXP Z1SEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -259,7 +259,7 @@ END_RCPP
 }
 // matVderS2
 arma::mat matVderS2(arma::mat Ome2, int nDomains);
-RcppExport SEXP SAE_matVderS2(SEXP Ome2SEXP, SEXP nDomainsSEXP) {
+RcppExport SEXP saedevel_matVderS2(SEXP Ome2SEXP, SEXP nDomainsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -275,7 +275,7 @@ END_RCPP
 }
 // matVderR1
 arma::mat matVderR1(double rho1, double sigma1, arma::mat Z1, arma::mat Ome1, arma::mat W);
-RcppExport SEXP SAE_matVderR1(SEXP rho1SEXP, SEXP sigma1SEXP, SEXP Z1SEXP, SEXP Ome1SEXP, SEXP WSEXP) {
+RcppExport SEXP saedevel_matVderR1(SEXP rho1SEXP, SEXP sigma1SEXP, SEXP Z1SEXP, SEXP Ome1SEXP, SEXP WSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -294,7 +294,7 @@ END_RCPP
 }
 // matVderR2
 arma::mat matVderR2(double rho2, double sigma2, arma::mat Ome2, int nDomains);
-RcppExport SEXP SAE_matVderR2(SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Ome2SEXP, SEXP nDomainsSEXP) {
+RcppExport SEXP saedevel_matVderR2(SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Ome2SEXP, SEXP nDomainsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -312,7 +312,7 @@ END_RCPP
 }
 // blue
 arma::colvec blue(arma::colvec y, arma::mat X, arma::mat Vinv);
-RcppExport SEXP SAE_blue(SEXP ySEXP, SEXP XSEXP, SEXP VinvSEXP) {
+RcppExport SEXP saedevel_blue(SEXP ySEXP, SEXP XSEXP, SEXP VinvSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -329,7 +329,7 @@ END_RCPP
 }
 // llr
 Rcpp::List llr(arma::colvec y, arma::mat X, double rho1, double sigma1, double rho2, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W);
-RcppExport SEXP SAE_llr(SEXP ySEXP, SEXP XSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP) {
+RcppExport SEXP saedevel_llr(SEXP ySEXP, SEXP XSEXP, SEXP rho1SEXP, SEXP sigma1SEXP, SEXP rho2SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -352,7 +352,7 @@ END_RCPP
 }
 // optimizerRho
 double optimizerRho(arma::colvec rho, arma::colvec y, arma::mat X, double sigma1, double sigma2, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K);
-RcppExport SEXP SAE_optimizerRho(SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP sigma1SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP KSEXP) {
+RcppExport SEXP saedevel_optimizerRho(SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP sigma1SEXP, SEXP sigma2SEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP KSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -376,7 +376,7 @@ END_RCPP
 }
 // optimizerSigma
 arma::colvec optimizerSigma(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, double K, arma::mat Z);
-RcppExport SEXP SAE_optimizerSigma(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP KSEXP, SEXP ZSEXP) {
+RcppExport SEXP saedevel_optimizerSigma(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP KSEXP, SEXP ZSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -400,7 +400,7 @@ END_RCPP
 }
 // optimizeRESTR
 arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double K, arma::mat Z, double tol, int maxit);
-RcppExport SEXP SAE_optimizeRESTR(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP nDomainsSEXP, SEXP nTimeSEXP, SEXP KSEXP, SEXP ZSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
+RcppExport SEXP saedevel_optimizeRESTR(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP nDomainsSEXP, SEXP nTimeSEXP, SEXP KSEXP, SEXP ZSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
