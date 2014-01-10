@@ -411,3 +411,46 @@ arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y,
  
   return Z * vv;
 }
+
+// [[Rcpp::export]]
+arma::colvec optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double K, double tol, int maxit) {
+ 
+  // R
+  Rcpp::List listR = matRST(vardir);
+  arma::mat sqrtRinv = listR(2);
+ 
+  // G
+  arma::colvec tmp(sqrtRinv.n_rows);
+  tmp.fill(reVar);
+  Rcpp::List listG = matRST(tmp);
+  arma::mat G = listG(0);
+  arma::mat sqrtGinv = listG(2);
+  
+  // V
+  Rcpp::List listV = matRST(vardir + reVar);
+  arma::mat Vinv = listV(1);
+  
+  //  residuals
+  arma::mat Z(sqrtRinv.n_rows, sqrtRinv.n_rows);
+  Z.eye();
+  
+  arma::colvec resid = y - X * beta;
+  arma::mat ZtsqrtRinv = Z.t() * sqrtRinv;
+  
+  // Starting Values
+  arma::colvec vv = G * Z.t() * Vinv * resid;
+  
+  // Algorithm
+  int i = 0;
+  double diff = 1.0;
+  
+  while(diff > tol) {
+    i++;
+    arma::colvec vvTest = vv;
+    vv = optimizerRE(vv, y, X, beta, resid, Z, Vinv, sqrtRinv, G, sqrtGinv, ZtsqrtRinv);
+    diff = sum(pow(vv-vvTest, 2));
+    if (i > maxit) break;
+  }
+ 
+  return Z * vv;
+}

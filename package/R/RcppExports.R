@@ -93,3 +93,7 @@ optimizeRESTR <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDo
     .Call('saedevel_optimizeRESTR', PACKAGE = 'saedevel', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit)
 }
 
+optimizeRER <- function(reVar, vardir, y, X, beta, K, tol, maxit) {
+    .Call('saedevel_optimizeRER', PACKAGE = 'saedevel', reVar, vardir, y, X, beta, K, tol, maxit)
+}
+

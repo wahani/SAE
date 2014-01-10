@@ -11,7 +11,7 @@ optimizeRE <- function(modelSpecs) {
 }
 
 #' @rdname optimizeRE
-#' @S3method optimizeRE MSSTR
+#' @S3method optimizeRE MSSTRFH
 optimizeRE.MSSTRFH <- function(modelSpecs) {
   optimizeRESTR(modelSpecs$sigma, modelSpecs$rho, 
                 modelSpecs$y, modelSpecs$X, modelSpecs$Z1, modelSpecs$sigmaSamplingError, 
@@ -24,3 +24,11 @@ optimizeRE.MSSTRFH <- function(modelSpecs) {
 optimizeRE.default <- function(modelSpecs) {
   stop(paste(sub("MS", "", class(modelSpecs)), "is an unknown model specification.")) 
 }
+
+#' @rdname optimizeRE
+#' @S3method optimizeRE MSRFH
+optimizeRE.MSRFH <- function(modelSpecs) {
+  optimizeRER(modelSpecs$reVar, modelSpecs$vardir, modelSpecs$y, modelSpecs$X, 
+              modelSpecs$beta, modelSpecs$K, modelSpecs$tol, modelSpecs$maxIter)
+}
+

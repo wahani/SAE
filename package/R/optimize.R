@@ -42,28 +42,6 @@ optimizeBeta <- function(modelSpecs) {
   return(modelSpecs)
 }
 
-#' optimizeSigma
-#' 
-#' @description find optimal sigma coefficients for given variance parameters
-#' 
-#' @param modelSpecs list with all necessary components for estimation
-optimizeSigma <- function(modelSpecs) {
-  
-  optimizerWrapper <- function(sigma) {
-    optimizerSigma(sigma, y = modelSpecs$y, X = modelSpecs$X, Z1 = modelSpecs$Z1, 
-                   sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
-                   W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z)
-  }
-  
-  modelSpecs$sigma <- fp(optimizerWrapper, 
-                         modelSpecs$sigma, 
-                         opts = list(tol = modelSpecs$tol, 
-                                     maxiter = modelSpecs$maxIter))$x
-  
-
-  return(modelSpecs)
-}
-
 #' optimizeRho
 #' 
 #' @description find optimal rho coefficients for given variance parameters
