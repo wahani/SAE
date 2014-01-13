@@ -1,8 +1,3 @@
-#' optimizeSigma
-#' 
-#' @description find optimal sigma coefficients for given variance parameters
-#' 
-#' @param modelSpecs list with all necessary components for estimation
 optimizeSigma <- function(modelSpecs) {
   
   modelSpecs$sigma <- fp(optimizerSigma, 
@@ -62,10 +57,3 @@ optimizeReVar.MSRFH <- function(modelSpecs) {
      k = modelSpecs$k, K = modelSpecs$K, modelSpecs$psiFunction)$x
   modelSpecs
 }
-
-
-
-
-
-
-

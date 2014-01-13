@@ -4,9 +4,8 @@ fitfh <- function(formula, vardir, idName, data, optsRobust = genOptsRobust(), o
   modelSpecs <- addStartValues(modelSpecs)
   modelSpecs <- optimizeParam(modelSpecs)
   modelSpecs <- optimizeRE(modelSpecs)
-  
+  modelSpecs <- addPrediction(modelSpecs)
   out <- list(prediction = modelSpecs$prediction, fitparam = modelSpecs$fitparam, 
               fitre = modelSpecs$fitre)
-  
   out
 }

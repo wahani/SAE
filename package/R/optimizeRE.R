@@ -28,7 +28,22 @@ optimizeRE.default <- function(modelSpecs) {
 #' @rdname optimizeRE
 #' @S3method optimizeRE MSRFH
 optimizeRE.MSRFH <- function(modelSpecs) {
-  optimizeRER(modelSpecs$reVar, modelSpecs$vardir, modelSpecs$y, modelSpecs$X, 
-              modelSpecs$beta, modelSpecs$K, modelSpecs$tol, modelSpecs$maxIter)
+    
+  # Starting optimization/algorithm
+  fitre <- try(optimizeRER(modelSpecs$reVar, modelSpecs$vardir, modelSpecs$y, modelSpecs$X, 
+                  modelSpecs$beta, modelSpecs$K, modelSpecs$tol, modelSpecs$maxIter))
+  
+  # Error handling:
+  if (inherits(tmp, "try-error")) {
+    fitre <- list(x = NA, returnStatus = 2, errorMessage = fitre[1], errorCall = NA)
+  } else {
+    fitre$returnStatus <- if(fitre$returnStatus) 0 else 1
+  }
+  
+  # Adding fitre to modelSpecs
+  fitre$call <- match.call()
+  class(fitre) <- "fp"
+  modelSpecs$fitre <- fitre
+  modelSpecs
 }
 

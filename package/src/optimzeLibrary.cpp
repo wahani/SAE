@@ -219,19 +219,7 @@ double optimizerRho(arma::colvec rho, arma::colvec y, arma::mat X, double sigma1
   double optRho2 = tmp5(0, 0) - tmp3;
       
   return pow(optRho1, 2) + pow(optRho2, 2);
-//    return Rcpp::List::create(Rcpp::Named("V", V),
-//    Rcpp::Named("Vinv", Vinv),
-//    Rcpp::Named("sqrtU", sqrtU),
-//    Rcpp::Named("sqrtUinv", sqrtUinv),
-//    Rcpp::Named("resid", resid),
-//    Rcpp::Named("phiR", phiR),
-//    Rcpp::Named("tmp1", tmp1),
-//    Rcpp::Named("tmp2", tmp2),
-//    Rcpp::Named("tmp3", tmp3),
-//    Rcpp::Named("tmp4", tmp4),
-//    Rcpp::Named("tmp5", tmp5),
-//    Rcpp::Named("optRho1", optRho1),
-//    Rcpp::Named("optRho2", sqrtU));
+
 }
 
 // [[Rcpp::export]]
@@ -298,22 +286,7 @@ arma::colvec optimizerSigma(arma::colvec sigma, arma::colvec rho, arma::colvec y
   A(1,1) = trace(tmp3 * tmp5);
   
   return inv(A) * a;
-  
-//    return Rcpp::List::create(Rcpp::Named("V", V),
-//    Rcpp::Named("Vinv", Vinv),
-//    Rcpp::Named("sqrtU", sqrtU),
-//    Rcpp::Named("sqrtUinv", sqrtUinv),
-//    Rcpp::Named("resid", resid),
-//    Rcpp::Named("phiR", phiR),
-//    Rcpp::Named("ZVuZt", ZVuZt),
-//    Rcpp::Named("ZVuZtinv", ZVuZtinv),
-//    Rcpp::Named("tmp1", tmp1),
-//    Rcpp::Named("tmp2", tmp2),
-//    Rcpp::Named("tmp3", tmp3),
-//    Rcpp::Named("tmp4", tmp4),
-//    Rcpp::Named("tmp5", tmp5),
-//    Rcpp::Named("a", a),
-//    Rcpp::Named("A", A));
+
 }
 
 Rcpp::List matRST(arma::colvec sigmaSamplingError) {
@@ -413,7 +386,7 @@ arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y,
 }
 
 // [[Rcpp::export]]
-arma::colvec optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double K, double tol, int maxit) {
+Rcpp::List optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double K, double tol, int maxit) {
  
   // R
   Rcpp::List listR = matRST(vardir);
@@ -451,6 +424,9 @@ arma::colvec optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma
     diff = sum(pow(vv-vvTest, 2));
     if (i > maxit) break;
   }
- 
-  return Z * vv;
+  
+  return Rcpp::List::create(Rcpp::Named("x", Z * vv), 
+                            Rcpp::Named("iterations", i),
+                            Rcpp::Named("returnStatus", diff < tol));
+  
 }
