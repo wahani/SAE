@@ -16,4 +16,23 @@ summary.fitSTREBLUP <- function(fit) {
   x
 }
 
-#predict.fitSTREBLUP <- function(fit) eval(expression(xb + u1 + u2), envir=fit$data)
+summary.RFH <- function(fit, ...) {
+  out <- list(summaryPred = summary(as.numeric(fit$prediction)))
+  out$coeffFixed <- fit$fitparam[fit$fitparam$m == max(fit$fitparam$m) & fit$fitparam$param == "beta", "stepParam"][[1]]
+  colnames(out$coeffFixed) <- "Estimate"
+  out$coeffRandom <- matrix(fit$fitparam[fit$fitparam$m == max(fit$fitparam$m) & fit$fitparam$param == "reVar", "stepParam"][[1]])
+  colnames(out$coeffRandom) <- "Estimate"
+  rownames(out$coeffRandom) <- "Variance Parameter"
+  
+  cat("\nCall:\n")
+  print(fit$call)
+  cat("\n\nCoefficients (fixed-effects):\n")
+  print(out$coeffFixed)
+  cat("\nCoefficients (random-effects):\n")
+  print(out$coeffRandom)
+  cat("\n\nSummary for predicted dependent variable:\n")
+  cat("\t", out$summaryPred)
+  cat("\n\n")
+  invisible(out)
+}
+
