@@ -25,13 +25,15 @@ algorithmFH <- function(expr, modelSpecs, paramNames = c("beta", "reVar")) {
   }
   
   oldParam <- unlist(lapply(paramNames, get, envir = modelSpecs)) + 1
-  i <- 1
-  while(i <= modelSpecs$maxIter) {
+  i <- 0
+  while(i < modelSpecs$maxIter) {
+    i <- i + 1
     eval(expr=expr)
     newParam <- unlist(lapply(paramNames, get, envir = modelSpecs))
     if(isTolReached(newParam, oldParam)) break else oldParam <- newParam
-    i <- i + 1
   }
   
+  modelSpecs$fitparam$m <- sort(rep(1:i, length(unique(modelSpecs$fitparam$param))))
+      
   modelSpecs
 }

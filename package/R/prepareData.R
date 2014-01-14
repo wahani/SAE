@@ -35,6 +35,11 @@ prepareData <- function(formula, dat, nDomains, nTime, beta, sigma, rho, sigmaSa
                      
                      # "Empty" Vector of Random Effects Estimates
                      u = numeric(nDomains * nTime))
+  
+  modelSpecs$fitparam <- data.frame(param = character(), m = numeric(), stepIterations = numeric(), 
+                             stepParam = list(), returnStatus = numeric(), stringsAsFactors=FALSE)
+  modelSpecs$fitparam$stepParam <- list()  
+  
   class(modelSpecs) <- c("MSSTRFH")
   return(modelSpecs)
 }
@@ -71,6 +76,9 @@ genModelSpecs <- function(optsRobust = genOptsRobust(), optsOptim = genOptsOptim
   mapply("assign", names(optsRobust), optsRobust, MoreArgs = list(envir = out))
   mapply("assign", names(optsOptim), optsOptim, MoreArgs = list(envir = out))
   out$psiFunction <- psiOne
+  out$fitparam <- data.frame(param = character(), m = numeric(), stepIterations = numeric(), 
+                             stepParam = list(), returnStatus = numeric(), stringsAsFactors=FALSE)
+  out$fitparam$stepParam <- list()  
   class(out) <- c(class(out), paste("MS", type, sep = ""))
   out
 }

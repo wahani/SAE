@@ -16,10 +16,10 @@ optimizeBeta <- function(modelSpecs) {
   # Initilize vectors for beta coefficients:
   newBeta <- modelSpecs$beta
   beta <- modelSpecs$beta
-  iter <- 1
+  iter <- 0
   
   # Begin NR-Algorithm - see Issue 1 - Paper - Numerical Stability
-  while(all((newBeta - beta)^2 > modelSpecs$tol) || iter == 1 & iter < modelSpecs$maxIter) {
+  while(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol) || iter == 0 & iter < modelSpecs$maxIter) {
     
     beta <- newBeta
     
@@ -33,6 +33,15 @@ optimizeBeta <- function(modelSpecs) {
     #cat(iter)
     iter <- iter + 1 
   }
+  
   modelSpecs$beta <- newBeta
+  
+  # Reporting for algorithm
+  n <- NROW(modelSpecs$fitparam)
+  modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus")] <- 
+    data.frame("beta", 1, iter, as.numeric(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)), 
+             stringsAsFactors=FALSE)
+  modelSpecs$fitparam$stepParam[n + 1] <- list(newBeta)
+    
   return(modelSpecs)
 }

@@ -8,10 +8,8 @@ optimizeSigma <- function(modelSpecs) {
                          sigmaSamplingError = modelSpecs$sigmaSamplingError, rho = modelSpecs$rho,
                          W = modelSpecs$w, beta = modelSpecs$beta, K = modelSpecs$K, Z = modelSpecs$Z)$x
   
-  
   return(modelSpecs)
 }
-
 
 optimizeReVar <- function(modelSpecs) {
   # Generic function: computes varianze Parameters of random effects
@@ -51,9 +49,19 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
 
 optimizeReVar.MSRFH <- function(modelSpecs) {
   # Generic function: computes varianze Parameters of random effects
-  modelSpecs$reVar <- fp(optimizerReVarRFH, modelSpecs$reVar, opts = list(tol = modelSpecs$tol, 
-                                                      maxiter = modelSpecs$maxIter),
-     vardir = modelSpecs$vardir, y = modelSpecs$y, X = modelSpecs$X, beta = modelSpecs$beta,
-     k = modelSpecs$k, K = modelSpecs$K, modelSpecs$psiFunction)$x
+  fit <- fp(optimizerReVarRFH, modelSpecs$reVar, opts = list(tol = modelSpecs$tol, 
+                                                             maxiter = modelSpecs$maxIter),
+            vardir = modelSpecs$vardir, y = modelSpecs$y, X = modelSpecs$X, beta = modelSpecs$beta,
+            k = modelSpecs$k, K = modelSpecs$K, modelSpecs$psiFunction)
+  
+  modelSpecs$reVar <- fit$x
+    
+  # Reporting for algorithm
+  n <- NROW(modelSpecs$fitparam)
+  modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus")] <- 
+    data.frame("reVar", 1, fit$iterations, fit$returnStatus, 
+               stringsAsFactors=FALSE)
+  modelSpecs$fitparam$stepParam[n + 1] <- list(fit$x)
+  
   modelSpecs
 }
