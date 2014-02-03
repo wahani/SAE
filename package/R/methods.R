@@ -36,3 +36,17 @@ summary.RFH <- function(fit, ...) {
   invisible(out)
 }
 
+residuals.RFH <- function(object, type = c("sampling", "RE", "combined"), 
+                          ...) {
+  if(!("y" %in% names(object))) stop("Set the 'y = TRUE' in the call: ", paste(object$call))
+  object <- fit
+  linearPredictor <- object$prediction - object$fitre$x
+  out <- data.frame(sampling = object$y - object$prediction, RE = object$fitre$x, 
+                    combined = object$y - linearPredictor)
+  out[, type]
+}
+
+predict.RFH <- function(object, type = c("linearPredictor", "EBLUP"), ...) {
+  data.frame(EBLUP = object$prediction, linearPredictor = object$prediction - object$fitre$x)[, type]
+}
+

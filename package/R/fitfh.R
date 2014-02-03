@@ -1,5 +1,5 @@
 fitfh <- function(formula, vardir, idName, data, optsRobust = genOptsRobust(), 
-                  optsOptim = genOptsOptim(), type = "RFH") {
+                  optsOptim = genOptsOptim(), type = "RFH", y=TRUE) {
   # Check Input:
   availableTypes <- c("RFH", "tmp")
   if(!(type %in% availableTypes)) 
@@ -15,6 +15,7 @@ fitfh <- function(formula, vardir, idName, data, optsRobust = genOptsRobust(),
   modelSpecs <- addPrediction(modelSpecs)
   out <- list(call = match.call(), prediction = modelSpecs$prediction, fitparam = modelSpecs$fitparam, 
               fitre = modelSpecs$fitre)
+  if (y) out$y <- modelSpecs$y
   class(out) <- type
   out
 }
