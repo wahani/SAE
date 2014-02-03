@@ -48,6 +48,7 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
 }
 
 optimizeReVar.MSRFH <- function(modelSpecs) {
+  startTime <- proc.time()[3]
   # Generic function: computes varianze Parameters of random effects
   fit <- fp(optimizerReVarRFH, modelSpecs$reVar, opts = list(tol = modelSpecs$tol, 
                                                              maxiter = modelSpecs$maxIter),
@@ -57,9 +58,10 @@ optimizeReVar.MSRFH <- function(modelSpecs) {
   modelSpecs$reVar <- fit$x
     
   # Reporting for algorithm
+  usedTime <- proc.time()[3] - startTime
   n <- NROW(modelSpecs$fitparam)
-  modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus")] <- 
-    data.frame("reVar", 1, fit$iterations, fit$returnStatus, 
+  modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus", "timeElapsed")] <- 
+    data.frame("reVar", 1, fit$iterations, fit$returnStatus, usedTime,
                stringsAsFactors=FALSE)
   modelSpecs$fitparam$stepParam[n + 1] <- list(fit$x)
   

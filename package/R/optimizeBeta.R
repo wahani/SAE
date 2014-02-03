@@ -1,6 +1,8 @@
 optimizeBeta <- function(modelSpecs) {
-  #update necessary components
   
+  startTime <- proc.time()[3]
+  
+  #update necessary components
   listV <- compV(modelSpecs)
   
   V <- listV$V
@@ -37,11 +39,13 @@ optimizeBeta <- function(modelSpecs) {
   modelSpecs$beta <- newBeta
   
   # Reporting for algorithm
+  usedTime <- proc.time()[3] - startTime
+  
   n <- NROW(modelSpecs$fitparam)
-  modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus")] <- 
-    data.frame("beta", 1, iter, as.numeric(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)), 
-             stringsAsFactors=FALSE)
+  modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus", "timeElapsed")] <- 
+    data.frame("beta", 1, iter, as.numeric(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)),
+               usedTime, stringsAsFactors=FALSE)
   modelSpecs$fitparam$stepParam[n + 1] <- list(newBeta)
-    
+  
   return(modelSpecs)
 }

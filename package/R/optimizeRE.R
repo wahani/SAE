@@ -34,7 +34,7 @@ optimizeRE.MSRFH <- function(modelSpecs) {
                   modelSpecs$beta, modelSpecs$K, modelSpecs$tol, modelSpecs$maxIter))
   
   # Error handling:
-  if (inherits(tmp, "try-error")) {
+  if (inherits(fitre, "try-error")) {
     fitre <- list(x = NA, returnStatus = 2, errorMessage = fitre[1], errorCall = NA)
   } else {
     fitre$returnStatus <- if(fitre$returnStatus) 0 else 1

@@ -77,7 +77,8 @@ genModelSpecs <- function(optsRobust = genOptsRobust(), optsOptim = genOptsOptim
   mapply("assign", names(optsOptim), optsOptim, MoreArgs = list(envir = out))
   out$psiFunction <- psiOne
   out$fitparam <- data.frame(param = character(), m = numeric(), stepIterations = numeric(), 
-                             stepParam = list(), returnStatus = numeric(), stringsAsFactors=FALSE)
+                             stepParam = list(), returnStatus = numeric(),
+                             timeElapsed = numeric(), stringsAsFactors=FALSE)
   out$fitparam$stepParam <- list()  
   class(out) <- c(class(out), paste("MS", type, sep = ""))
   out
