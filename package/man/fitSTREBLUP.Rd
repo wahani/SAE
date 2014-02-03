@@ -6,7 +6,8 @@
     sigmaSamplingError = seSigmaClosure(nDomains, nTime)(),
     nDomains = getNDomains(dat), nTime = getNTime(dat),
     w0 = w0Matrix(nDomains), w = w0/rowSums(w0),
-    tol = 0.001, method = "Nelder-Mead", maxIter = 500)
+    tol = 0.001, method = "Nelder-Mead", maxIter = 500,
+    k = 1.345)
 }
 \arguments{
   \item{formula}{formula for the fixed effects part}

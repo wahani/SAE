@@ -1,6 +1,6 @@
 \name{updateV}
 \alias{updateV}
-\title{updateP}
+\title{updateV}
 \usage{
   updateV(sigma1, Ome1, A, Z1)
 }
