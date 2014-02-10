@@ -17,7 +17,7 @@ library(sp)
 library(spgwr)
 library(spdep)
 library(mnormt)
-set.seed(40)
+set.seed(120)
 rm(list=ls())
 
 #------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ DataSetup <- list(
   # parameter-value of the intercept
   alpha=100,
   # parameter-value of the slope
-  beta=5,
+  beta=1,
   # parameter-value of the intercept outlier
   alphaout=150,
   # parameter-value of the slope ourlier
@@ -128,7 +128,7 @@ DataSetup <- list(
   # Mean of the contamination mixture for the random effect
   vmucontam=9,
   # Standard deviation of the un-contaminated random effect
-  vsigma=sqrt(1),
+  vsigma=sqrt(4),
   # Standard deviation of the contamination mixture of the random effect
   vsigmacontam=sqrt(20),                    
   # Spatial correlation in the area effects
@@ -147,7 +147,7 @@ DataSetup <- list(
 SampleSetup<- list(snunits=10)
 # number of sampled units per small area
 
-simruns <-      5
+simruns <- 5
 # number of simulation runs
 Pop<-NULL
 #------------------------------------------------------------------------------
@@ -487,8 +487,7 @@ describe <- function(object){
 if(DataSetup$nrow_spatial*DataSetup$ncol_spatial==DataSetup$nclusters){print("Dimension Spatial Matrix valid")}else{print("Wrong Dimension Spatial Matrix")}
 #------------------------------------------------------------------------------
 
-#save.image(file=paste("c:\\Arbeit\\04-Publikationen\\Interactive Tuning c\\Modelbased\\",szen[t],"\\",szen[t],".RData",sep=""))
-save.image(file="c:\\Arbeit\\02-Simulation\\R\\Estimators\\REBLUP\\Test.RData")
+#save(Pop, file="c:\\Arbeit\\02-Simulation\\R\\Estimators\\REBLUP\\Test.RData")
 
 ymean<-tapply(Pop[[1]]$y,Pop[[1]]$clusterid, mean)
 xmean<-tapply(Pop[[1]]$x,Pop[[1]]$clusterid, mean)
@@ -496,3 +495,5 @@ p_start <- moran.test(as.numeric(ymean), nb2listw(nb_structure, style="W"))
 Y.mod <- errorsarlm(as.vector(ymean) ~ as.vector(xmean), listw = W_list)
 p_start
 Y.mod
+
+View(Pop[[1]])
