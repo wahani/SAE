@@ -20,8 +20,8 @@ aggSample <- left_join(aggSample, trueY)
 aggSample$var1 <- sd(residuals(summary(lm(y ~ x, aggSample))))^2/10
 aggSample <- aggSample[order(aggSample$clusterid), ]
 
-fitRFH <- fitfh(formula = y ~ x, vardir="var1", idName="clusterid", data = aggSample)
-fitFH <- eblupFH(y ~ x, var1, method = "REML", data = aggSample)
+fitRFH <- fitfh(formula = y ~ x, vardir="bootSD", idName="clusterid", data = aggSample)
+fitFH <- eblupFH(y ~ x, bootSD, method = "REML", data = aggSample)
 
 ggplot(melt(data.frame(
   DIRECTBIAS = (aggSample$trueY - aggSample$y)/aggSample$trueY,
@@ -36,3 +36,27 @@ plot(resid(fit, "sampling"), resid(fit, "RE"))
 alt <- eblupFH(yi ~ MajorArea, SD, method = "REML", MAXITER = 100, PRECISION = 0.0001, data = milk)
 
 plot(predict(fit))
+
+
+
+bootstrapMean <- do.call("rbind",
+                         lapply(split(Pop[[1]], Pop[[1]]$clusterid),
+                                function(dat) {
+                                  data.frame(k = 1:500, clusterid = unique(dat$clusterid),
+                                             y = replicate(500, mean(dat[sample(nrow(dat), 5), "y"]), simplify = "numeric"))
+                                }))
+
+bootSD <- bootstrapMean %.% group_by(clusterid) %.% summarise(sd = sd(y))
+aggSample$bootSD <- bootSD[order(bootSD$clusterid), "sd"]
+
+
+
+
+
+
+
+
+
+
+
+
