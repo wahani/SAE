@@ -23,23 +23,26 @@ summary.RFH <- function(fit, ...) {
   out$coeffRandom <- matrix(fit$fitparam[fit$fitparam$m == max(fit$fitparam$m) & fit$fitparam$param == "reVar", "stepParam"][[1]])
   colnames(out$coeffRandom) <- "Estimate"
   rownames(out$coeffRandom) <- "Variance Parameter"
-  
+  out$call <- fit$call
+  class(out) <- "summary.RFH"
+  out
+}
+
+print.summary.RFH <- function(x, ...) {
   cat("\nCall:\n")
-  print(fit$call)
+  print(x$call)
   cat("\n\nCoefficients (fixed-effects):\n")
-  print(out$coeffFixed)
+  print(x$coeffFixed)
   cat("\nCoefficients (random-effects):\n")
-  print(out$coeffRandom)
+  print(x$coeffRandom)
   cat("\n\nSummary for predicted dependent variable:\n")
-  cat("\t", out$summaryPred)
+  cat("\t", x$summaryPred)
   cat("\n\n")
-  invisible(out)
 }
 
 residuals.RFH <- function(object, type = c("sampling", "RE", "combined"), 
                           ...) {
   if(!("y" %in% names(object))) stop("Set the 'y = TRUE' in the call: ", paste(object$call))
-  object <- fit
   linearPredictor <- object$prediction - object$fitre$x
   out <- data.frame(sampling = object$y - object$prediction, RE = object$fitre$x, 
                     combined = object$y - linearPredictor)

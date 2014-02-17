@@ -88,7 +88,7 @@ t=20
 
 DataSetup <- list(
   # number of areas/clusters
-  nclusters=25,
+  nclusters=100,
   # number of units per small area
   nunits=100,
   # parameter-value of the intercept
@@ -116,9 +116,9 @@ DataSetup <- list(
   # Outlier type: Representative outlier (TRUE), Non-representative outlier (FALSE)
   outlier_type=TRUE,
   # relative number of outliers, model error
-  eepsilon=0,
+  eepsilon=0.1,
   # Mean of the contamination mixture for the model error
-  emucontam=20,
+  emucontam=10,
   # Standard deviation of the un-contaminated model error
   esigma=sqrt(4),
   # Standard deviation of the contamination mixture for the model error
@@ -147,7 +147,7 @@ DataSetup <- list(
 SampleSetup<- list(snunits=10)
 # number of sampled units per small area
 
-simruns <- 5
+simruns <- 100
 # number of simulation runs
 Pop<-NULL
 #------------------------------------------------------------------------------
@@ -496,4 +496,4 @@ Y.mod <- errorsarlm(as.vector(ymean) ~ as.vector(xmean), listw = W_list)
 p_start
 Y.mod
 
-View(Pop[[1]])
+# View(Pop[[1]])
