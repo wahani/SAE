@@ -61,3 +61,16 @@ psiOne <- function(u,k = 1.345,deriv = 0){
   w <- MASS::psi.huber(u/(sm * sqrt(var.weights)),k, deriv)
   if (!deriv) return(w*u) else return(w)
 }
+
+#' psiOne
+#' 
+#' @description Psi-function - see \code{\link{MASS::psi.huber}}
+#' 
+#' @param u
+#' @param k
+#' @param deriv 
+#' 
+psiTwo <- function(u, k = 1.345, deriv = 0){
+  w <- MASS::psi.huber(u, k, deriv)
+  if (!deriv) return(w*u) else return(w)
+}

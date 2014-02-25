@@ -18,6 +18,7 @@
 #' 
 fitfh <- function(formula, vardir, idName, data, optsRobust = genOptsRobust(), 
                   optsOptim = genOptsOptim(), type = "RFH", y=TRUE) {
+  
   # Check Input:
   availableTypes <- c("RFH")
   if(!(type %in% availableTypes)) 

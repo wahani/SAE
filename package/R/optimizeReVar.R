@@ -25,15 +25,15 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
   
   # V
   V <- diag(vardir + reVar)
-  Vinv <- diag(1 / (vardir + reVar))
+  Vinv <- diag(1 / diag(V))
   
   # G
   G <- diag(reVar, nrow = nrow(V))
-  Ginv <- diag(1 / reVar, nrow = nrow(V))
+  Ginv <- diag(1 / diag(G))
   
   # U
   sqrtU <- updateSqrtU(V=V)
-  sqrtUinv <- diag(1/diag(sqrtU))
+  sqrtUinv <- diag(1 / diag(sqrtU))
   
   # residuals
   resid <- sqrtUinv %*% (y - X %*% beta)
@@ -49,7 +49,7 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
 
 optimizeReVar.MSRFH <- function(modelSpecs) {
   startTime <- proc.time()[3]
-  # Generic function: computes varianze Parameters of random effects
+  # Generic function: computes variance Parameters of random effects
   fit <- fp(optimizerReVarRFH, modelSpecs$reVar, opts = list(tol = modelSpecs$tol, 
                                                              maxiter = modelSpecs$maxIter),
             vardir = modelSpecs$vardir, y = modelSpecs$y, X = modelSpecs$X, beta = modelSpecs$beta,
