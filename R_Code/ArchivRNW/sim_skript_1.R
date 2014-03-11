@@ -4,8 +4,6 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 
-source(file="R_Code/Spatial_Data_Generation_Pop.R")
-
 simulationWrapper <- function(i) {
   # Sample:
   sampledPop <- Pop[[i]][sample_id[, i], ]
@@ -27,16 +25,19 @@ simulationWrapper <- function(i) {
     summarise(var = var(y), trueY = mean(y), v = mean(v))
   
   # Zusammenspielen der wahren Werte und aggregiertem Sample
-  aggSample <- left_join(aggSample, trueY, by="clusterid")
+  aggSample <- left_join(aggSample, trueY, by = "clusterid")
   aggSample$var1 <- sd(residuals(summary(lm(y ~ x, aggSample))))^2/10
   aggSample <- aggSample[order(aggSample$clusterid), ]
+  
+  tmp <- lm(y~x, data = aggSample)
+  var(tmp$residuals)
   
   # Schätzung des FH-Models
   # Robust:
   if(class(try({
-  fitRFH <- fitfh(formula = y ~ x, vardir="var1", idName="clusterid", data = aggSample, optsRobust = genOptsRobust())
-  # Nicht-Robust:
-  fitFH <- eblupFH(y ~ x, var1, method = "REML", data = aggSample)})) == "try-error") return(NULL)
+    fitRFH <- fitfh(formula = y ~ x, vardir="varTrue", idName="clusterid", data = aggSample, optsRobust = genOptsRobust(k = 1000))
+    # Nicht-Robust:
+    fitFH <- eblupFH(y ~ x, varTrue, method = "REML", data = aggSample)})) == "try-error") return(NULL)
   
   # Zusammenfassung der Ergebniss:
   aggSample$rfhY <- fitRFH$prediction
@@ -81,16 +82,3 @@ dat <- melt(tmp, id.vars = c("scenario", "r", "clusterid", "trueY")) %.%
             RBIAS = calcRBIAS(trueY, value),
             MSE = calcMSE(trueY, value),
             RRMSE = calcRRMSE(trueY, value))
-
-
-
-ggplot(dat) + geom_boxplot(aes_string(x = "variable", y = "RBIAS"))
-ggplot(dat) + geom_boxplot(aes_string(x = "variable", y = "RRMSE"))
-
-
-ggplot(attr(tmp, "simMetaData")) + geom_density(aes(x= refvar, colour = proc))
-
-
-
-
-

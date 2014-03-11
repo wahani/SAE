@@ -116,7 +116,7 @@ DataSetup <- list(
   # Outlier type: Representative outlier (TRUE), Non-representative outlier (FALSE)
   outlier_type=TRUE,
   # relative number of outliers, model error
-  eepsilon=0,
+  eepsilon=0.05,
   # Mean of the contamination mixture for the model error
   emucontam=10,
   # Standard deviation of the un-contaminated model error
@@ -124,7 +124,7 @@ DataSetup <- list(
   # Standard deviation of the contamination mixture for the model error
   esigmacontam=sqrt(150),
   # relative number of outliers, area-specific random effect
-  vepsilon=0.1,
+  vepsilon=0.05,
   # Mean of the contamination mixture for the random effect
   vmucontam=9,
   # Standard deviation of the un-contaminated random effect
@@ -154,9 +154,9 @@ Pop<-NULL
 # Generation of the data  
 #------------------------------------------------------------------------------
 if(DataSetup$outlier_type==TRUE){
-#------------------------------------------------------------------------------
-# Generation of the population (Representative outliers)   
-#------------------------------------------------------------------------------
+  #------------------------------------------------------------------------------
+  # Generation of the population (Representative outliers)   
+  #------------------------------------------------------------------------------
   
   
   # Generate the spatial Matrix W
@@ -164,7 +164,6 @@ if(DataSetup$outlier_type==TRUE){
   nb_structure <- cell2nb(DataSetup$nrow_spatial,DataSetup$ncol_spatial,type=DataSetup$type) 
   xyccc <- attr(nb_structure, "region.id")
   xycc <- matrix(as.integer(unlist(strsplit(xyccc, ":"))), ncol=2, byrow=TRUE)
-  plot(nb_structure, xycc)
   
   W_list<-nb2listw(nb_structure)
   W <- nb2mat(nb_structure, glist=NULL, style=DataSetup$w_style) # Spatial Matrix W
@@ -268,23 +267,23 @@ if(DataSetup$outlier_type==TRUE){
     return(res)
   }
   
-
+  
   # Data output and storage
   for(ii in 1:simruns){
-  # Data output and storage
-  Pop[ii]<-list(GetPop(DataSetup))
+    # Data output and storage
+    Pop[ii]<-list(GetPop(DataSetup))
   }
   
   
-#------------------------------------------------------------------------------
+  #------------------------------------------------------------------------------
   
-# Drawing of samples
-#------------------------------------------------------------------------------
+  # Drawing of samples
+  #------------------------------------------------------------------------------
   sample_id<-matrix(0,nrow=DataSetup$nclusters*SampleSetup$snunits,ncol=simruns)
   sample_y<-matrix(0,nrow=DataSetup$nclusters*SampleSetup$snunits,ncol=simruns)
   
   
-for(u in 1:simruns){
+  for(u in 1:simruns){
     # SampleSetup     a list object that defines the parameters 
     GetSample <- function(SampleSetup){
       # generate the sample
@@ -297,18 +296,17 @@ for(u in 1:simruns){
     sample_y[,u]<-cbind(Pop[[u]][sample_id[,u],1])
   }
   
-
-#------------------------------------------------------------------------------
-# Generation of the population (Non-Representative outliers)
+  
+  #------------------------------------------------------------------------------
+  # Generation of the population (Non-Representative outliers)
 }else{
-#------------------------------------------------------------------------------
- 
+  #------------------------------------------------------------------------------
+  
   # Generate the spatial Matrix W
   
   nb_structure <- cell2nb(DataSetup$nrow_spatial,DataSetup$ncol_spatial,type=DataSetup$type) 
   xyccc <- attr(nb_structure, "region.id")
   xycc <- matrix(as.integer(unlist(strsplit(xyccc, ":"))), ncol=2, byrow=TRUE)
-  plot(nb_structure, xycc)
   
   W_list<-nb2listw(nb_structure)
   W <- nb2mat(nb_structure, glist=NULL, style=DataSetup$w_style) # Spatial Matrix W
@@ -389,15 +387,15 @@ for(u in 1:simruns){
   }
   
   for(ii in 1:simruns){
-  # Data output and storage
-  Pop[ii]<-list(GetPop(DataSetup))
+    # Data output and storage
+    Pop[ii]<-list(GetPop(DataSetup))
   }
-
+  
   
   #------------------------------------------------------------------------------
   
-# Drawing of samples
-#------------------------------------------------------------------------------
+  # Drawing of samples
+  #------------------------------------------------------------------------------
   sample_id<-matrix(0,nrow=DataSetup$nclusters*SampleSetup$snunits,ncol=simruns)
   sample_y<-matrix(0,nrow=DataSetup$nclusters*SampleSetup$snunits,ncol=simruns)
   sample_out_e<-matrix(0,nrow=DataSetup$nclusters*SampleSetup$snunits,ncol=simruns)
@@ -487,13 +485,3 @@ describe <- function(object){
 if(DataSetup$nrow_spatial*DataSetup$ncol_spatial==DataSetup$nclusters){print("Dimension Spatial Matrix valid")}else{print("Wrong Dimension Spatial Matrix")}
 #------------------------------------------------------------------------------
 
-#save(Pop, file="c:\\Arbeit\\02-Simulation\\R\\Estimators\\REBLUP\\Test.RData")
-
-ymean<-tapply(Pop[[1]]$y,Pop[[1]]$clusterid, mean)
-xmean<-tapply(Pop[[1]]$x,Pop[[1]]$clusterid, mean)
-p_start <- moran.test(as.numeric(ymean), nb2listw(nb_structure, style="W"))
-Y.mod <- errorsarlm(as.vector(ymean) ~ as.vector(xmean), listw = W_list)
-p_start
-Y.mod
-
-# View(Pop[[1]])
