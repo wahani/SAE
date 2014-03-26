@@ -40,8 +40,8 @@ simulationWrapper <- function(i) {
     fitFH <- eblupFH(y ~ x, var1, method = "REML", data = aggSample)})) == "try-error") return(NULL)
   
   # Zusammenfassung der Ergebniss:
-  aggSample$rfhY <- fitRFH$prediction
-  aggSample$fhY <- fitFH$eblup
+  aggSample$rfhY <- as.numeric(fitRFH$prediction)
+  aggSample$fhY <- as.numeric(fitFH$eblup)
   aggSample$r <- i
   aggSample$scenario <- "(0,0,0,0)"
   simulatedData <- aggSample %.% select(scenario, r, clusterid, trueY, rfhY, fhY, y) %.%

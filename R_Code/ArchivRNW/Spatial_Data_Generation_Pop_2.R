@@ -118,7 +118,7 @@ DataSetup <- list(
   # relative number of outliers, model error
   eepsilon=0,
   # Mean of the contamination mixture for the model error
-  emucontam=10,
+  emucontam=20,
   # Standard deviation of the un-contaminated model error
   esigma=sqrt(4),
   # Standard deviation of the contamination mixture for the model error
@@ -126,9 +126,9 @@ DataSetup <- list(
   # relative number of outliers, area-specific random effect
   vepsilon=0.05,
   # Mean of the contamination mixture for the random effect
-  vmucontam=9,
+  vmucontam=10,
   # Standard deviation of the un-contaminated random effect
-  vsigma=sqrt(4),
+  vsigma=sqrt(1),
   # Standard deviation of the contamination mixture of the random effect
   vsigmacontam=sqrt(20),                    
   # Spatial correlation in the area effects
@@ -147,7 +147,7 @@ DataSetup <- list(
 SampleSetup<- list(snunits=10)
 # number of sampled units per small area
 
-simruns <- 100
+simruns <- 500
 # number of simulation runs
 Pop<-NULL
 #------------------------------------------------------------------------------
@@ -454,9 +454,9 @@ describe <- function(object){
   cat("No. of clusters (i=1,...,m): ", object$nclusters,"\n")
   cat("No. units per clusters (j=1,...,k): ", object$nunits,"\n")
   cat("Representative Outliers typ: ", object$outlier_type,"\n")
-  cat("Spatial Information in v: ", object$p,"\n")
-  cat("Spatial Neighbour Structure: ", object$type,"\n")
-  cat("Spatial Weighting Structure: ", object$w_style,"\n")
+  #   cat("Spatial Information in v: ", object$p,"\n")
+  #   cat("Spatial Neighbour Structure: ", object$type,"\n")
+  #   cat("Spatial Weighting Structure: ", object$w_style,"\n")
   cat("Sample size per area: ", SampleSetup$snunits,"\n")
   cat("Simulation runs: ", simruns,"\n")
   cat("\n")
@@ -482,6 +482,3 @@ describe <- function(object){
     cat("  e_ij  ~ (", 1-object$eepsilon, ")*N(0, ", object$esigma^2, ") + ", object$eepsilon, "*N(", object$emucontam, ", ", object$esigmacontam^2, ") \n", sep="")
   }
 }
-if(DataSetup$nrow_spatial*DataSetup$ncol_spatial==DataSetup$nclusters){print("Dimension Spatial Matrix valid")}else{print("Wrong Dimension Spatial Matrix")}
-#------------------------------------------------------------------------------
-
