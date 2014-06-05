@@ -1,0 +1,13 @@
+Package: saedevel
+Type: Package
+Title: Small Area Estimation
+Version: 0.3
+Date: 2013-11-01
+Author: Sebastian Warnholz
+Maintainer: Sebastian Warnholz <Sebastian.Warnholz@fu-berlin.de>
+Description: Nothing to say
+License: Don't know yet
+Depends: spatioTemporalData, MASS, testthat, parallelTools, Rcpp (>= 0.10.5), RcppArmadillo (>= 0.3.920.1), fuTools, nloptr
+LazyLoad: No
+ByteCompile: TRUE
+LinkingTo: Rcpp, RcppArmadillo
