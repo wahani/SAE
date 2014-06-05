@@ -37,6 +37,7 @@ optimizeRE.MSRFH <- function(modelSpecs) {
   if (inherits(fitre, "try-error")) {
     fitre <- list(x = NA, returnStatus = 2, errorMessage = fitre[1], errorCall = NA)
   } else {
+    if(any(is.na(fitre$x))) fitre$x <- matrix(rep_len(0, length(fitre$x)))
     fitre$returnStatus <- if(fitre$returnStatus) 0 else 1
   }
   
