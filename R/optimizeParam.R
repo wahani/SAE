@@ -29,6 +29,7 @@ algorithmFH <- function(expr, modelSpecs, paramNames = c("beta", "reVar")) {
   oldParam <- unlist(lapply(paramNames, get, envir = modelSpecs)) + 1
   i <- 0
   while(i < modelSpecs$maxIter) {
+    if(modelSpecs$progress) cat("Iteration:", i, "\n")
     # Don't even start with invalid starting values
     if(any(paramNames %in% c("reVar")) && 
          i > 0 &&

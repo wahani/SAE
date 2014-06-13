@@ -20,9 +20,11 @@ optimizeBeta <- function(modelSpecs) {
   beta <- modelSpecs$beta
   iter <- 0
   
+  if(modelSpecs$progress) cat("\n--Optimizing beta--\n")
   # Begin NR-Algorithm - see Issue 1 - Paper - Numerical Stability
-  while(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol) || iter == 0 & iter < modelSpecs$maxIter) {
+  while(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol) & iter == 0 | iter < modelSpecs$maxIter) {
     
+    if(modelSpecs$progress) cat("Iteration:", iter, "\n")
     beta <- newBeta
     
     resid <- sqrtUinv %*% (modelSpecs$y - modelSpecs$X %*% beta)
