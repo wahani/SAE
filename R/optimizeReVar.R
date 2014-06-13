@@ -43,7 +43,14 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
   a <- t(psiResid) %*% sqrtU %*% Vinv %*% Vinv %*% sqrtU %*% psiResid
   A <- matTrace(K * Vinv %*% Ginv)
   
-  as.numeric(a / A)
+  est <- as.numeric(a / A)
+  
+  if(any(is.na(est)) || any(est == Inf)) {
+    warning("Varince Parameter is not identified and is set to 0")
+    is.na(est) <- 0
+    est[est==Inf] <- 0
+  }
+  est
   
 }
 
