@@ -47,7 +47,7 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
   
   if(any(is.na(est)) || any(est == Inf)) {
     warning("Varince Parameter is not identified and is set to 0")
-    is.na(est) <- 0
+    est[is.na(est)] <- 0
     est[est==Inf] <- 0
   }
   est

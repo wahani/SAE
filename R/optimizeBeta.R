@@ -42,11 +42,11 @@ optimizeBeta <- function(modelSpecs) {
   
   # Reporting for algorithm
   usedTime <- proc.time()[3] - startTime
-  
+  convergence <- if(iter == modelSpecs$maxIter & 
+                      all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)) 0 else 1
   n <- NROW(modelSpecs$fitparam)
   modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus", "timeElapsed")] <- 
-    data.frame("beta", 1, iter, as.numeric(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)),
-               usedTime, stringsAsFactors=FALSE)
+    data.frame("beta", 1, iter, convergence, usedTime, stringsAsFactors=FALSE)
   modelSpecs$fitparam$stepParam[n + 1] <- list(newBeta)
   
   return(modelSpecs)
