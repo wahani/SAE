@@ -221,4 +221,4 @@ test_that("RFH is handling non-ververgent parameters", {
   rfh <- fitfh(y ~ turn_1Mean + wpMean + sc2Mean + sc3Mean + sc4Mean + sc5Mean, 
                data = dat, vardir = "dirVar2", idName = "idD")
   expect_equal(unique(rfh$fitparam$returnStatus[1]), 1)
-}
+})

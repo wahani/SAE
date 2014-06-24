@@ -22,7 +22,7 @@ optimizeBeta <- function(modelSpecs) {
   
   if(modelSpecs$progress) cat("\n--Optimizing beta--\n")
   # Begin NR-Algorithm - see Issue 1 - Paper - Numerical Stability
-  while(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol) & iter == 0 | iter < modelSpecs$maxIter) {
+  while(all((abs(newBeta - beta)/newBeta) > modelSpecs$tol) & iter < modelSpecs$maxIter | iter == 0) {
     
     if(modelSpecs$progress) cat("Iteration:", iter, "\n")
     beta <- newBeta
@@ -43,7 +43,7 @@ optimizeBeta <- function(modelSpecs) {
   # Reporting for algorithm
   usedTime <- proc.time()[3] - startTime
   convergence <- if(iter == modelSpecs$maxIter & 
-                      all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)) 0 else 1
+                      all((abs(newBeta - beta)/newBeta) > modelSpecs$tol)) 1 else 0
   n <- NROW(modelSpecs$fitparam)
   modelSpecs$fitparam[n + 1, c("param", "m", "stepIterations", "returnStatus", "timeElapsed")] <- 
     data.frame("beta", 1, iter, convergence, usedTime, stringsAsFactors=FALSE)
