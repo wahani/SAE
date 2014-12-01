@@ -16,7 +16,7 @@ optimizeRE.MSSTRFH <- function(modelSpecs) {
   optimizeRESTR(modelSpecs$sigma, modelSpecs$rho, 
                 modelSpecs$y, modelSpecs$X, modelSpecs$Z1, modelSpecs$sigmaSamplingError, 
                 modelSpecs$w, modelSpecs$beta, modelSpecs$nDomains, modelSpecs$nTime, 
-                modelSpecs$K, modelSpecs$Z, modelSpecs$tol, modelSpecs$maxIter)
+                modelSpecs$k, modelSpecs$Z, modelSpecs$tol, modelSpecs$maxIter)
 }
 
 #' @rdname optimizeRE
@@ -31,7 +31,7 @@ optimizeRE.MSRFH <- function(modelSpecs) {
     
   # Starting optimization/algorithm
   fitre <- try(optimizeRER(modelSpecs$reVar, modelSpecs$vardir, modelSpecs$y, modelSpecs$X, 
-                  modelSpecs$beta, modelSpecs$K, modelSpecs$tol, modelSpecs$maxIter))
+                  modelSpecs$beta, modelSpecs$k, modelSpecs$tol, modelSpecs$maxIter))
   
   # Error handling:
   if (inherits(fitre, "try-error")) {

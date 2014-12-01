@@ -325,15 +325,15 @@ Rcpp::List matGST(arma::colvec sigma, arma::colvec rho, arma::mat W, int nDomain
   
 }
 
-arma::colvec optimizerRE(arma::colvec vv, arma::colvec y, arma::mat X, arma::colvec beta, arma::colvec resid, arma::mat Z, arma::mat Vinv, arma::mat sqrtRinv, arma::mat G, arma::mat sqrtGinv, arma::mat ZtsqrtRinv) {
+arma::colvec optimizerRE(arma::colvec vv, arma::colvec y, arma::mat X, arma::colvec beta, arma::colvec resid, arma::mat Z, arma::mat Vinv, arma::mat sqrtRinv, arma::mat G, arma::mat sqrtGinv, arma::mat ZtsqrtRinv, double k) {
   
   arma::mat tmp = Z.t() * sqrtRinv;
   arma::colvec v_robust = vv;
   arma::colvec res1 = sqrtRinv * (resid - Z * v_robust);
   arma::colvec res2 = sqrtGinv * v_robust;
   
-  arma::mat w2 = arma::diagmat(psiOne(res1)/res1);
-  arma::mat w3 = arma::diagmat(psiOne(res2)/res2);
+  arma::mat w2 = arma::diagmat(psiOne(res1, k)/res1);
+  arma::mat w3 = arma::diagmat(psiOne(res2, k)/res2);
   
   arma::mat tmp1 = tmp * w2 * sqrtRinv;
   arma::mat Atmp1 =  tmp1 * Z;
@@ -348,7 +348,7 @@ arma::colvec optimizerRE(arma::colvec vv, arma::colvec y, arma::mat X, arma::col
 }
 
 // [[Rcpp::export]]
-arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double K, arma::mat Z, double tol, int maxit) {
+arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double k, arma::mat Z, double tol, int maxit) {
  
   // R
   Rcpp::List listR = matRST(sigmaSamplingError);
@@ -377,7 +377,7 @@ arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y,
   while(diff > tol) {
     i++;
     arma::colvec vvTest = vv;
-    vv = optimizerRE(vv, y, X, beta, resid, Z, Vinv, sqrtRinv, G, sqrtGinv, ZtsqrtRinv);
+    vv = optimizerRE(vv, y, X, beta, resid, Z, Vinv, sqrtRinv, G, sqrtGinv, ZtsqrtRinv, k);
     diff = sum(pow(vv-vvTest, 2));
     if (i > maxit) break;
   }
@@ -386,7 +386,7 @@ arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y,
 }
 
 // [[Rcpp::export]]
-Rcpp::List optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double K, double tol, int maxit) {
+Rcpp::List optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double k, double tol, int maxit) {
  
   // R
   Rcpp::List listR = matRST(vardir);
@@ -420,7 +420,7 @@ Rcpp::List optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::
   while(diff > tol) {
     i++;
     arma::colvec vvTest = vv;
-    vv = optimizerRE(vv, y, X, beta, resid, Z, Vinv, sqrtRinv, G, sqrtGinv, ZtsqrtRinv);
+    vv = optimizerRE(vv, y, X, beta, resid, Z, Vinv, sqrtRinv, G, sqrtGinv, ZtsqrtRinv, k);
     diff = sum(pow(vv-vvTest, 2));
     if (i > maxit) break;
   }

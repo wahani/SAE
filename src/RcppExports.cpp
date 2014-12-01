@@ -399,8 +399,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // optimizeRESTR
-arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double K, arma::mat Z, double tol, int maxit);
-RcppExport SEXP saedevel_optimizeRESTR(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP nDomainsSEXP, SEXP nTimeSEXP, SEXP KSEXP, SEXP ZSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
+arma::colvec optimizeRESTR(arma::colvec sigma, arma::colvec rho, arma::colvec y, arma::mat X, arma::mat Z1, arma::colvec sigmaSamplingError, arma::mat W, arma::colvec beta, int nDomains, int nTime, double k, arma::mat Z, double tol, int maxit);
+RcppExport SEXP saedevel_optimizeRESTR(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP ySEXP, SEXP XSEXP, SEXP Z1SEXP, SEXP sigmaSamplingErrorSEXP, SEXP WSEXP, SEXP betaSEXP, SEXP nDomainsSEXP, SEXP nTimeSEXP, SEXP kSEXP, SEXP ZSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -415,11 +415,11 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< arma::colvec >::type beta(betaSEXP );
         Rcpp::traits::input_parameter< int >::type nDomains(nDomainsSEXP );
         Rcpp::traits::input_parameter< int >::type nTime(nTimeSEXP );
-        Rcpp::traits::input_parameter< double >::type K(KSEXP );
+        Rcpp::traits::input_parameter< double >::type k(kSEXP );
         Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP );
         Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
         Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP );
-        arma::colvec __result = optimizeRESTR(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit);
+        arma::colvec __result = optimizeRESTR(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, k, Z, tol, maxit);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -427,8 +427,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // optimizeRER
-Rcpp::List optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double K, double tol, int maxit);
-RcppExport SEXP saedevel_optimizeRER(SEXP reVarSEXP, SEXP vardirSEXP, SEXP ySEXP, SEXP XSEXP, SEXP betaSEXP, SEXP KSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
+Rcpp::List optimizeRER(double reVar, arma::colvec vardir, arma::colvec y, arma::mat X, arma::colvec beta, double k, double tol, int maxit);
+RcppExport SEXP saedevel_optimizeRER(SEXP reVarSEXP, SEXP vardirSEXP, SEXP ySEXP, SEXP XSEXP, SEXP betaSEXP, SEXP kSEXP, SEXP tolSEXP, SEXP maxitSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -438,10 +438,10 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP );
         Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP );
         Rcpp::traits::input_parameter< arma::colvec >::type beta(betaSEXP );
-        Rcpp::traits::input_parameter< double >::type K(KSEXP );
+        Rcpp::traits::input_parameter< double >::type k(kSEXP );
         Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
         Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP );
-        Rcpp::List __result = optimizeRER(reVar, vardir, y, X, beta, K, tol, maxit);
+        Rcpp::List __result = optimizeRER(reVar, vardir, y, X, beta, k, tol, maxit);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

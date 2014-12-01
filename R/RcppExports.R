@@ -89,11 +89,11 @@ optimizerSigma <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K,
     .Call('saedevel_optimizerSigma', PACKAGE = 'saedevel', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, K, Z)
 }
 
-optimizeRESTR <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit) {
-    .Call('saedevel_optimizeRESTR', PACKAGE = 'saedevel', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, K, Z, tol, maxit)
+optimizeRESTR <- function(sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, k, Z, tol, maxit) {
+    .Call('saedevel_optimizeRESTR', PACKAGE = 'saedevel', sigma, rho, y, X, Z1, sigmaSamplingError, W, beta, nDomains, nTime, k, Z, tol, maxit)
 }
 
-optimizeRER <- function(reVar, vardir, y, X, beta, K, tol, maxit) {
-    .Call('saedevel_optimizeRER', PACKAGE = 'saedevel', reVar, vardir, y, X, beta, K, tol, maxit)
+optimizeRER <- function(reVar, vardir, y, X, beta, k, tol, maxit) {
+    .Call('saedevel_optimizeRER', PACKAGE = 'saedevel', reVar, vardir, y, X, beta, k, tol, maxit)
 }
 
