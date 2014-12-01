@@ -1,8 +1,7 @@
 context(desc="Testing robust FH:")
 
 test_that(desc="fitfh is producing 'good'/'expected' results:", {
-  library(saedevel)
-  library(sae)
+  browser()
   tmp <- genModelSpecs(type = "test")
   expect_error(addModelFrame(tmp, y ~ x, "x", "x", data.frame(y = rnorm(100), x = rnorm(100))))
   
@@ -17,7 +16,7 @@ test_that(desc="fitfh is producing 'good'/'expected' results:", {
   modelSpecs <- optimizeParam(modelSpecs)
   modelSpecs <- optimizeRE(modelSpecs)
     
-  fh <- eblupFH(yi ~ MajorArea, SD, method = "REML", MAXITER = 100, PRECISION = 1e-06, data = milk)$eblup
+  fh <- sae::eblupFH(yi ~ MajorArea, SD, method = "REML", MAXITER = 100, PRECISION = 1e-06, data = milk)$eblup
   
   rfh <- modelSpecs$X %*% modelSpecs$beta + modelSpecs$fitre$x
   expect_that(fh, equals(rfh, tolerance = 0.015))

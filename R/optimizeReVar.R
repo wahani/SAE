@@ -1,6 +1,6 @@
 optimizeSigma <- function(modelSpecs) {
   
-  modelSpecs$sigma <- fp(optimizerSigma, 
+  modelSpecs$sigma <- fuTools::fp(optimizerSigma, 
                          modelSpecs$sigma, 
                          opts = list(tol = modelSpecs$tol, 
                                      maxiter = modelSpecs$maxIter),
@@ -57,7 +57,7 @@ optimizerReVarRFH <- function(reVar, vardir, y, X, beta, k, K, psiFunction) {
 optimizeReVar.MSRFH <- function(modelSpecs) {
   startTime <- proc.time()[3]
   # Generic function: computes variance Parameters of random effects
-  fit <- fp(optimizerReVarRFH, modelSpecs$reVar, opts = list(tol = modelSpecs$tol, 
+  fit <- fuTools::fp(optimizerReVarRFH, modelSpecs$reVar, opts = list(tol = modelSpecs$tol, 
                                                              maxiter = modelSpecs$maxIter),
             vardir = modelSpecs$vardir, y = modelSpecs$y, X = modelSpecs$X, beta = modelSpecs$beta,
             k = modelSpecs$k, K = modelSpecs$K, modelSpecs$psiFunction)

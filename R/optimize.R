@@ -4,7 +4,7 @@
 #' 
 #' @param modelSpecs list with all necessary components for estimation
 optimizeRho <- function(modelSpecs) {
-  modelSpecs$rho <- nloptr(modelSpecs$rho, 
+  modelSpecs$rho <- nloptr::nloptr(modelSpecs$rho, 
                            optimizerRho,
                            lb = c(-0.99, -0.99), ub = c(0.99, 0.99),
                            opts = list(algorithm = "NLOPT_LN_NELDERMEAD",

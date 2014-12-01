@@ -1,4 +1,4 @@
 library(testthat)
-library(SAE)
+library(saedevel)
 
-test_package("SAE")
+test_package("saedevel")
